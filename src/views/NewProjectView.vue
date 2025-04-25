@@ -1,15 +1,11 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { addDoc, collection } from "firebase/firestore";
 import { db } from '../firebase'; // Adjust the path as necessary
 
-const props = defineProps({
-  userId: {
-    type: String,
-    required: true
-  }
-});
+const userId = ref("");
+
 const suggestedStacks = [
   { name: 'Vue.js', description: 'A progressive JavaScript framework for building user interfaces.' },
   { name: 'React', description: 'A JavaScript library for building user interfaces.' },
@@ -27,20 +23,24 @@ const project = ref({
   createdAt: new Date(),
 });
 
-function onSubmit(){
+async function onSubmit(){
   if (!project.value.name || !project.value.description) {
     alert("Please fill in all required fields.");
     return;
   }
-  addDoc(collection(db, 'users', props.userId, 'projects'), project.value)
+  await addDoc(collection(db, 'users', userId.value, 'projects'), project.value)
     .then(() => {
       console.log('Project added successfully');
-      router.push(`/users/${props.userId}/projects`);
+      router.push(`/users/${userId.value}/projects`);
     })
     .catch((error) => {
       console.error('Error adding project:', error);
     });
 }
+
+onMounted(() => {
+  userId.value = useRoute().params.userId; // Replace with actual user ID
+});
 
 // Picture handling
 const fileInput = ref(null);

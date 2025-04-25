@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, defineProps } from 'vue';
-import { getDocs, collection, getDoc, doc } from 'firebase/firestore';
+import { getDocs, collection } from 'firebase/firestore';
 import { db } from '../firebase';
 import ProjectItem from "@/components/ProjectItem.vue"; // Adjust the path as necessary
 
@@ -11,20 +11,13 @@ const props = defineProps({
   }
 });
 const projects = ref([]);
-const user = ref(null); // Assuming you have a way to get the current user
 onMounted(async () => {
   try {
-    const userDoc = await getDoc(doc(db, 'users', props.userId));
-    if (userDoc.exists()) {
-      user.value = { id: userDoc.id, ...userDoc.data() };
-      const projectsCollection = collection(db, 'projects');
-      const querySnapshot = await getDocs(projectsCollection);
-      projects.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } else {
-      console.error('No such document!');
-    }
+    console.log("caca ", props.userId);
+    const querySnapshot = await getDocs(collection(db, "users", props.userId, "projects"));
+    projects.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    console.error("Error fetching projects: ", error);
   }
 });
 

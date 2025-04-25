@@ -1,13 +1,15 @@
 <script setup>
-import NewProjectForm from "@/components/NewProjectForm.vue";
 import { useRoute } from "vue-router";
 import ProjectList from "@/components/ProjectList.vue";
 
-const actualUserId = useRoute().params.id;
+const route = useRoute();
+const actualUserId = route.params.userId;
 </script>
 
 <template>
-  <NewProjectForm :user-id="actualUserId" />
+  <router-link :to="'/users/' + actualUserId + '/projects/new'">
+CREATE
+    </router-link>
   <ProjectList :user-id="actualUserId"/>
 </template>
 
