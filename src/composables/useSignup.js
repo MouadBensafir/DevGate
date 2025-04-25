@@ -44,8 +44,6 @@ const useSignup = () => {
         lastname: lastname.value,
         email: email.value,
         bio: bio.value,
-        isOnline: true,
-        groups: [],
         birthday: birthday.value,
         createdAt: new Date(),
         role: "user",

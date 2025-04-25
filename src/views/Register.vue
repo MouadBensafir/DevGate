@@ -1,7 +1,14 @@
 <template>
   <div class="register-container">
-    <form @submit.prevent="register" class="bg-light p-4 rounded shadow-sm">
+    <form @submit.prevent="register" class="bg-light p-4 rounded shadow-sm">      
       <h2 class="text-center text-success main-title mb-4">Create an Account</h2>
+
+      <!-- Google Sign In Button -->
+      <div class="text-center mt-4">
+        <button @click="signInWithGoogle" type="button" class="btn btn-outline-danger px-4">
+          <i class="bi bi-google me-2"></i> Sign in with Google
+        </button>
+      </div>
 
       <!-- First & Last Name -->
       <div class="row mb-3">
@@ -88,16 +95,21 @@
 </template>
 
 <script>
-  export default {
-    name: "register-view",
-  };
-  </script>
-  
+export default {
+  name: 'register-view'
+}
+</script>
+
 <script setup>
 import { ref } from 'vue';
 import useSignup from '@/composables/useSignup';
+import { auth, db } from '@/firebase';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'vue-router';
 
 const { email, password, firstname, lastname, bio, birthday, error, pdp, register } = useSignup();
+const router = useRouter();
 
 // File upload handlers
 const fileInput = ref(null);
@@ -128,9 +140,39 @@ function handleFileDrop(event) {
     reader.readAsDataURL(file);
   }
 }
+
+// Google Sign-In Handler
+async function signInWithGoogle() {
+  const provider = new GoogleAuthProvider();
+
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        firstname: user.displayName?.split(' ')[0] || '',
+        lastname: user.displayName?.split(' ')[1] || '',
+        email: user.email,
+        bio: 'No real bio yet',
+        birthday: '',
+        createdAt: new Date(),
+        role: "user",
+        pdp: user.photoURL || 'https://i.postimg.cc/05zJ6r52/duck-default.png',
+      });
+    }
+
+    await router.push('/');
+  } catch (err) {
+    console.error("Google sign-in error:", err);
+    error.value = err.message;
+  }
+}
 </script>
 
-  
 <style scoped>
 .register-container {
   display: flex;
@@ -210,5 +252,4 @@ textarea.form-control {
 .upload-box:hover .upload-placeholder i {
   transform: scale(1.2);
 }
-
 </style>
