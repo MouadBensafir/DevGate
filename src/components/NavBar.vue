@@ -38,9 +38,9 @@
           </router-link>
         </template>
         <template v-else>
-          <router-link v-if="userInfo && userInfo.uid" :to="`/profile/${userInfo?.uid}`" class="nature-nav-item d-flex align-items-center mb-2 p-2">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/projects/${userInfo?.uid}`" class="nature-nav-item d-flex align-items-center mb-2 p-2">
             <i class="bi bi-person-circle me-3"></i>
-            <span>View Profile</span>
+            <span>View Projects</span>
           </router-link>
           <router-link to="/notifs" class="nature-nav-item d-flex align-items-center mb-2 p-2">
             <i class="bi bi-bell me-3"></i>
@@ -74,7 +74,7 @@
   import { auth, db } from '@/firebase'
   import { useRouter } from 'vue-router'
   import { doc, updateDoc } from 'firebase/firestore'
-  
+
   const logged_in = inject('logged_in')
   const userInfo = inject('userDoc')
   const router = useRouter()
