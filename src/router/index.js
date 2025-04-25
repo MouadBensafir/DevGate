@@ -7,6 +7,7 @@ import Profile from '../views/ProfileView.vue'
 import Projects from '../views/ProjectsView.vue'
 import SkillTracker from '../views/SkillTrackerView.vue'
 import Timeline from '../views/TimelineView.vue'
+import NewProjectView from "@/views/NewProjectView.vue";
 
 const routes = [
   {
@@ -25,29 +26,34 @@ const routes = [
     component: Register,
   },
   {
-    path: "/objectives/:objectiveId",
+    path: "/users/:userId/objectives",
     name: "objective",
     component: Objectives,
   },
   {
-    path: "/profile/:profileId",
+    path: "/users/:userId/profile",
     name: "profile",
     component: Profile,
   },
   {
-    path: "/projects/:userId",
+    path: "/users/:userId/projects",
     name: "projects",
     component: Projects,
   },
   {
-    path: "/skill-tracker/:userId",
+    path: "/users/:userId/skill-tracker",
     name: "skill-tracker",
     component: SkillTracker,
   },
   {
-    path: "/timeline/:userId",
+    path: "/users/:userId/timeline",
     name: "timeline",
     component: Timeline,
+  },
+  {
+    path: "/users/:userId/projects/new",
+    name: "new-project",
+    component: NewProjectView
   }
 ]
 
