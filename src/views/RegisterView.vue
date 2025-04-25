@@ -6,7 +6,8 @@
       <!-- Google Sign In Button -->
       <div class="text-center mt-4">
         <button @click="signInWithGoogle" type="button" class="btn btn-outline-danger px-4">
-          <i class="bi bi-google me-2"></i> Sign in with Google
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" class="me-2" />
+          Sign in with Google
         </button>
       </div>
 
@@ -103,13 +104,11 @@ export default {
 <script setup>
 import { ref } from 'vue';
 import useSignup from '@/composables/useSignup';
-import { auth, db } from '@/firebase';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { useRouter } from 'vue-router';
+import useGoogleSignIn from '@/composables/useGoogleSignIn';
 
+const { signInWithGoogle } = useGoogleSignIn();
 const { email, password, firstname, lastname, bio, birthday, error, pdp, register } = useSignup();
-const router = useRouter();
+
 
 // File upload handlers
 const fileInput = ref(null);
@@ -138,37 +137,6 @@ function handleFileDrop(event) {
       pdp.value = reader.result;
     };
     reader.readAsDataURL(file);
-  }
-}
-
-// Google Sign-In Handler
-async function signInWithGoogle() {
-  const provider = new GoogleAuthProvider();
-
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        firstname: user.displayName?.split(' ')[0] || '',
-        lastname: user.displayName?.split(' ')[1] || '',
-        email: user.email,
-        bio: 'No real bio yet',
-        birthday: '',
-        createdAt: new Date(),
-        role: "user",
-        pdp: user.photoURL || 'https://i.postimg.cc/05zJ6r52/duck-default.png',
-      });
-    }
-
-    await router.push('/');
-  } catch (err) {
-    console.error("Google sign-in error:", err);
-    error.value = err.message;
   }
 }
 </script>

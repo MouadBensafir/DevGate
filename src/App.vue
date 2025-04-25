@@ -1,13 +1,17 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/login">Login</router-link> |
-    <router-link to="/register">Register</router-link>
-  </nav>
-  <router-view/>
+  <div class="d-flex vh-100">
+    <!-- Sidebar with fixed width -->
+    <NavBar class="flex-shrink-0" style="width: 250px;" />
+
+    <!-- Main content takes remaining space -->
+    <div class="flex-grow-1 overflow-auto">
+      <router-view />
+    </div>
+  </div>
 </template>
 
 <script setup>
+import NavBar from "@/components/NavBar.vue"
 import { ref, watch, provide } from "vue"
 import { getDoc, doc } from "firebase/firestore"
 import { db } from "@/firebase" 
