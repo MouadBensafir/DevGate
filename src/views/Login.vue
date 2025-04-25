@@ -32,15 +32,15 @@
         </div>
       </form>
     </div>
-  </template>
+</template>
   
-  <script>
+<script>
   export default {
     name: "login-view",
   };
-  </script>
+</script>
 
-  <script setup>
+<script setup>
   import { ref } from 'vue'
   import useLogin from '@/composables/useLogin'
   import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
@@ -79,10 +79,10 @@
       error.value = err.message
     }
   }
-  </script>
+</script>
   
   
-  <style scoped>
+<style scoped>
  .login-container {
   display: flex;
   justify-content: center;
@@ -150,4 +150,4 @@
     color: white;
   }
   
-  </style>
+</style>

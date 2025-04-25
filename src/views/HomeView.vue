@@ -1,12 +1,12 @@
 <template>
-  <div class="home">
-    Dev Gate
+  <div>
+    55
   </div>
 </template>
 
-<script>
-
-export default {
-  name: 'HomeView'
-}
+<script setup>
 </script>
+
+<style scoped>
+
+</style>
