@@ -1,15 +1,15 @@
 <template>
   <div>
-    55
-    <router-link v-if="logged_in" :to="`/skill-tracker/${user?.uid}`">Go to Skill Tracker</router-link>
+    <router-link v-if="user?.uid" :to="`/users/${user.uid}/projects`">projects-view</router-link>
+    <p v-else>Loading user...</p>
   </div>
 </template>
 
-<script setup>
-import { inject } from 'vue'
 
-const logged_in = inject('logged_in')
-const user = inject('userDoc')
+<script setup>
+import getUser from '@/composables/getUser'
+
+const { user } = getUser()
 </script>
 
 <style scoped>
