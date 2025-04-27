@@ -1,5 +1,7 @@
 <script setup>
+
 import { ref, defineProps, onMounted, defineEmits } from 'vue';
+
 import { addDoc, collection, updateDoc, getDoc, doc } from "firebase/firestore";
 import { useRouter } from 'vue-router';
 import { db } from '../firebase'; // Adjust the path as necessary
