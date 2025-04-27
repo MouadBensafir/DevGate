@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex vh-100">
-    <!-- Sidebar with fixed width -->
-    <NavBar class="flex-shrink-0" style="width: 250px;" />
+    <!-- Sidebar with fixed width, mobile-friendly vertical navbar -->
+    <NavBar class="flex-shrink-0 d-none d-md-block" style="width: 250px;" /> <!-- Sidebar for PC -->
 
     <!-- Main content takes remaining space -->
     <div class="flex-grow-1 overflow-auto">
@@ -57,16 +57,20 @@ watch(user, async (newUser) => {
   color: #2c3e50;
 }
 
-nav {
-  padding: 30px;
+
+/* Sidebar for PC: Only visible on medium and larger screens (d-md-block) */
+.d-none.d-md-block {
+  display: block;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+@media (max-width: 768px) {
+  /* Navbar for mobile (horizontal): Only visible on smaller screens */
+  .d-md-none {
+    display: block !important;
+  }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+  .d-md-block {
+    display: none !important;
+  }
 }
 </style>
