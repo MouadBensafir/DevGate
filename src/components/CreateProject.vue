@@ -1,38 +1,91 @@
 <script setup>
-import { ref, defineProps } from 'vue';
+
+import { ref, defineProps, onMounted } from 'vue';
+import { addDoc, collection, updateDoc, getDoc, doc } from "firebase/firestore";
 import { useRouter } from 'vue-router';
-import { addDoc, collection } from "firebase/firestore";
 import { db } from '../firebase'; // Adjust the path as necessary
+
+const addedstack = ref("");
+let existing = ref(true);
+const project = ref({});
 
 const props = defineProps({
   userId: {
     type: String,
     required: true
+  },
+  editing: {
+    type: Boolean,
+    default: false
+  },
+  projectId: {
+    type: String,
   }
 });
-const suggestedStacks = [
-  { name: 'Vue.js', description: 'A progressive JavaScript framework for building user interfaces.' },
-  { name: 'React', description: 'A JavaScript library for building user interfaces.' },
-  { name: 'Angular', description: 'A platform for building mobile and desktop web applications.' },
-  { name: 'Node.js', description: 'JavaScript runtime built on Chrome\'s V8 JavaScript engine.' },
-  { name: 'Django', description: 'A high-level Python Web framework that encourages rapid development.' },
-];
-const router = useRouter();
-const project = ref({
-  name: '',
-  description: '',
-  stack: [],
-  github: '',
-  image: '',
-  createdAt: new Date(),
+
+onMounted(async () => {
+  if (props.editing) {
+    const docSnap = await getDoc(doc(db, 'users', props.userId, 'projects', props.projectId));
+      if (docSnap.exists()) {
+        project.value = {
+          id: docSnap.id,
+          ...docSnap.data()
+        };
+      }
+      else {
+        console.error("No such document!");
+      }
+  } else {
+    project.value = {
+      name: "",
+      description: "",
+      stack: [],
+      github: "",
+      image: ""
+    };
+  }
 });
 
-function onSubmit(){
-  if (!project.value.name || !project.value.description) {
+function addStack() {
+  if (addedstack.value && !project.value.stack.includes(addedstack.value)) {
+    project.value.stack.push(addedstack.value);
+    addedstack.value = "";
+  }
+}
+
+const suggestedStacks = [
+    'vuejs',
+    'reactjs',
+    'angular',
+    'nodejs',
+    'expressjs',
+    'mongodb',
+    'firebase',
+];
+const router = useRouter();
+
+async function onSubmit(){
+  console.log("je submit")
+  if (!props.editing && (!project.value.name || !project.value.description)) {
     alert("Please fill in all required fields.");
     return;
   }
-  addDoc(collection(db, 'users', props.userId, 'projects'), project.value)
+  project.value.date = new Date();
+  if (props.editing){
+    console.log("Editing project", project.value);
+    const projectRef = doc(db, 'users', props.userId, 'projects', project.value.id);
+    await updateDoc(projectRef, project.value)
+      .then(() => {
+        console.log('Project updated successfully');
+        // refresh the window
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error('Error updating project:', error);
+      });
+  }
+  else{
+    await addDoc(collection(db, 'users', props.userId, 'projects'), project.value)
     .then(() => {
       console.log('Project added successfully');
       router.push(`/users/${props.userId}/projects`);
@@ -40,6 +93,7 @@ function onSubmit(){
     .catch((error) => {
       console.error('Error adding project:', error);
     });
+  }
 }
 
 // Picture handling
@@ -75,7 +129,7 @@ function handleFileDrop(event) {
 
 <template>
   <div class="container mt-4">
-    <h1 class="mb-4">Create a New Project</h1>
+    <h1 class="mb-4">{{(editing) ? "Edit project" : "Create new project"}}</h1>
     <form @submit.prevent="onSubmit" class="needs-validation" novalidate>
       <div class="mb-3">
         <label for="name" class="form-label">Project Name:</label>
@@ -88,15 +142,29 @@ function handleFileDrop(event) {
         <div class="invalid-feedback">Please provide a description.</div>
       </div>
       <div class="mb-3">
-        <label for="stack" class="form-label">Tech Stack:</label>
-        <select class="form-select" id="stack" v-model="project.stack" multiple size="5">
-          <option v-for="stack in suggestedStacks" :key="stack.name" :value="stack.name">
-            {{ stack.name }} - {{ stack.description }}
+        <div v-if="existing">
+          <label for="stack" class="form-label">Choose a Tech Stack from the suggested stacks:</label>
+        <select v-if="existing" class="form-select" id="stack" v-model="project.stack" multiple size="5">
+          <option v-for="stack in suggestedStacks" :key="stack" :value="stack">
+            {{ stack }}
           </option>
-          <option value="other">Other</option>
         </select>
-        <small class="text-muted">Hold Ctrl/Cmd to select multiple options</small>
-      </div>
+        <small class="text-muted">Hold Ctrl/Cmd to select multiple options</small><br>
+        </div>
+        <button v-if="existing" type="button" class="btn btn-secondary mt-2" @click="existing = !existing">
+          Confirm the stack
+        </button>
+        <div v-if="!existing" class="mt-2">
+          <label :for="addedstack" class="form-label">Specify Other Tech:</label>
+          <input type="text" id="addedstack" v-model="addedstack" class="form-control" placeholder="Enter tech stack" />
+          <button type="button" class="btn btn-secondary mt-2" @click="addStack">Add</button>
+        </div>
+        <h6 class="mt-3">Selected Tech Stack:</h6>
+        <ul class="mt-2">
+          <li v-for="el in project.stack" :key="el">
+            <span class="badge bg-secondary">{{ el }}</span>
+          </li>
+        </ul>
       <div class="mb-3">
         <label for="github" class="form-label">GitHub Link:</label>
         <input type="url" class="form-control" id="github" v-model="project.github" placeholder="https://github.com/username/project" />
@@ -137,7 +205,8 @@ function handleFileDrop(event) {
           </div>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Create Project</button>
+      <button type="submit" class="btn btn-primary">{{(editing) ? "Edit project" : "Create project"}}</button>
+      </div>
     </form>
   </div>
 </template>

@@ -7,6 +7,7 @@ import Profile from '../views/ProfileView.vue'
 import Projects from '../views/ProjectsView.vue'
 import SkillTracker from '../views/SkillTrackerView.vue'
 import Timeline from '../views/TimelineView.vue'
+import NewProjectView from "@/views/NewProjectView.vue";
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
     path: "/users/:userId/timeline",
     name: "timeline",
     component: Timeline,
+  },
+  {
+    path: "/users/:userId/projects/new",
+    name: "new-project",
+    component: NewProjectView
   }
 ]
 
