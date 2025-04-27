@@ -213,6 +213,8 @@ const logout = async () => {
   box-shadow: var(--ocean-shadow);
   position: relative;
   z-index: 100;
+  overflow: hidden;
+  height: 56px
 }
 
 .ocean-toggle-btn {
@@ -228,15 +230,14 @@ const logout = async () => {
 }
 
 .ocean-mobile-menu {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease-in-out;
-  background-color: white;
+  max-height: 80vh; /* Prevent it from taking up the whole screen height */
+  overflow-y: auto; /* Allow scrolling within the mobile menu if necessary */
 }
 
-.ocean-mobile-menu.show {
-  max-height: 500px; /* Ajuster selon le contenu */
+.ocean-navbar-mobile .ocean-mobile-menu.show {
+  max-height: 80vh; /* Ensure the expanded mobile menu doesn't go beyond the screen */
 }
+
 
 /* Styles pour la sidebar desktop */
 .ocean-sidebar {

@@ -53,7 +53,7 @@
       <!-- Add Skill Button -->
       <button @click="showCreateForm = true" v-if="!showCreateForm" 
               class="btn add-skill-btn mt-5 d-flex align-items-center fw-bold">
-        <i class="bi bi-plus-circle-fill me-2"></i> Ajouter une compétence
+        <i class="bi bi-plus-circle-fill me-2"></i> Add a new Skill
       </button>
     </div>
     
@@ -119,7 +119,7 @@
 
           <div class="d-grid">
             <button type="submit" class="btn btn-primary btn-lg fw-bold">
-              <i class="bi bi-plus-lg me-2"></i> Ajouter
+              <i class="bi bi-plus-lg me-2"></i> Add
             </button>
           </div>
         </form>
