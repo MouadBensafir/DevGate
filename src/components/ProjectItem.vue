@@ -50,6 +50,11 @@ async function DeleteProject() {
   }
 }
 
+function updateProject() {
+  editing.value = false;
+  fetchProject();
+}
+
 </script>
 
 <template>
@@ -95,7 +100,7 @@ async function DeleteProject() {
       </div>
 
       <div v-if="editing" class="card-body">
-        <CreateProject :user-id="user.uid" :project-id="projectId" :editing="true" />
+        <CreateProject @projectUpdated="updateProject" :user-id="user.uid" :project-id="projectId" :editing="true" />
       </div>
 
       <div v-else class="card-body">

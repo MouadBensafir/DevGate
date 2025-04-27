@@ -62,7 +62,7 @@ function toggleDisplayMode() {
       <!-- Mode Galerie -->
       <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <div v-for="project in projects" :key="project.id" class="col">
-          <ProjectCard :userId="userId" :projectId="project.id"/>
+          <ProjectCard @projectDeleted="fetchProjects" :userId="userId" :projectId="project.id"/>
         </div>
       </div>
     </div>

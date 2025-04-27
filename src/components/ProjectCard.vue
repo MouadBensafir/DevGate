@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps } from 'vue';
+import {ref, onMounted, defineProps, defineEmits} from 'vue';
 import { getDoc, doc, deleteDoc } from 'firebase/firestore'
 import { db } from '../firebase';
 import getUser from "@/composables/getUser";
@@ -20,9 +20,11 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(["projectDeleted"]);
+
 const project = ref({});
 
-async function fetchProjects() {
+async function fetchProject() {
   const projectDoc = doc(db, "users", props.userId, "projects", props.projectId);
   const docSnap = await getDoc(projectDoc);
   if (docSnap.exists()) {
@@ -33,19 +35,24 @@ async function fetchProjects() {
 }
 
 onMounted(async () => {
-  await fetchProjects();
+  await fetchProject();
 });
 
 async function DeleteProject() {
   if (confirm("Are you sure you want to delete this project?")) {
     try {
       await deleteDoc(doc(db, "users", props.userId, "projects", props.projectId));
-      await fetchProjects();
+      emit("projectDeleted", props.projectId);
       alert("Project deleted successfully");
     } catch (error) {
       console.error("Error deleting project: ", error);
     }
   }
+}
+
+function updateProject() {
+  editing.value = false;
+  fetchProject();
 }
 </script>
 
@@ -113,7 +120,7 @@ async function DeleteProject() {
         </div>
 
         <div v-if="editing" class="mt-3">
-          <CreateProject :user-id="user.uid" :project-id="projectId" :editing="true" />
+          <CreateProject @projectUpdated="updateProject" :user-id="user.uid" :project-id="projectId" :editing="true" />
         </div>
       </div>
     </div>
