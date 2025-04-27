@@ -13,7 +13,7 @@
 <script setup>
 import { inject } from 'vue'
 
-const loggedIn = inject('loggedIn')
+const loggedIn = inject('logged_in')
 </script>
 
 <style scoped>
