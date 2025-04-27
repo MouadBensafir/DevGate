@@ -1,9 +1,17 @@
 <template>
-  <div class="d-flex vh-100">
-    <!-- Sidebar with fixed width, mobile-friendly vertical navbar -->
-    <NavBar class="flex-shrink-0 d-none d-md-block" style="width: 250px;" /> <!-- Sidebar for PC -->
+  <!-- Mobile Layout -->
+  <div class="d-md-none">
+    <NavBar />
+    <div class="overflow-auto">
+      <router-view />
+    </div>
+  </div>
 
-    <!-- Main content takes remaining space -->
+  <!-- Desktop Layout -->
+  <div class="d-none d-md-flex vh-100">
+    <div class="flex-shrink-0" style="width: 250px">
+      <NavBar />
+    </div>
     <div class="flex-grow-1 overflow-auto">
       <router-view />
     </div>
@@ -48,29 +56,14 @@ watch(user, async (newUser) => {
 }) 
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<style scoped>
+.overflow-auto {
+  height: calc(100vh - 56px); /* Adjust based on your mobile navbar height */
 }
 
-
-/* Sidebar for PC: Only visible on medium and larger screens (d-md-block) */
-.d-none.d-md-block {
-  display: block;
-}
-
-@media (max-width: 768px) {
-  /* Navbar for mobile (horizontal): Only visible on smaller screens */
-  .d-md-none {
-    display: block !important;
-  }
-
-  .d-md-block {
-    display: none !important;
+@media (min-width: 768px) {
+  .overflow-auto {
+    height: 100vh;
   }
 }
 </style>
