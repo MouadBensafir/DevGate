@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, onMounted } from 'vue';
+import { ref, defineProps, onMounted, defineEmits } from 'vue';
 import { addDoc, collection, updateDoc, getDoc, doc } from "firebase/firestore";
 import { useRouter } from 'vue-router';
 import { db } from '../firebase'; // Adjust the path as necessary
@@ -8,6 +8,7 @@ const addedstack = ref("");
 let existing = ref(true);
 const project = ref({});
 
+const emit = defineEmits(["projectUpdated"]);
 const props = defineProps({
   userId: {
     type: String,
@@ -76,8 +77,7 @@ async function onSubmit(){
     await updateDoc(projectRef, project.value)
       .then(() => {
         console.log('Project updated successfully');
-        // refresh the window
-        window.location.reload();
+        emit("projectUpdated");
       })
       .catch((error) => {
         console.error('Error updating project:', error);
