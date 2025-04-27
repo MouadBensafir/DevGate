@@ -1,60 +1,51 @@
 <template>
-  <div>
-    <form @submit.prevent="addSkill">
-      <h2 class="text-center">Add a Skill</h2>
+  <div class="container py-5">
+    <form @submit.prevent="addSkill" class="card p-4 shadow-sm">
+      <h2 class="text-center mb-4">Add a Skill</h2>
+
       <div class="mb-3">
         <label for="skill" class="form-label">Skill</label>
-        <input type="text" class="form-control" id="skill" placeholder="Enter your skill" v-model="new_skill" required />
+        <input
+          type="text"
+          id="skill"
+          class="form-control"
+          placeholder="Enter your skill"
+          v-model="newSkill"
+          required
+        />
       </div>
-      <div class="mb-3">
+
+      <div class="mb-4">
         <label for="level" class="form-label">Level</label>
-        <select class="form-select" id="level" required>
-          <option value="" disabled selected>Select your level</option>
+        <select
+          id="level"
+          class="form-select"
+          v-model="level"
+          required
+        >
+          <option value="" disabled>Select your level</option>
           <option value="beginner">Beginner</option>
           <option value="intermediate">Intermediate</option>
           <option value="advanced">Advanced</option>
         </select>
       </div>
-      <button type="submit">Add a skill</button>
+
+      <button type="submit" class="btn btn-primary w-100">
+        Add Skill
+      </button>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { getFirestore, doc, setDoc, arrayUnion } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
+import { useAddSkill } from '@/composables/useAddSkill'
 
-const new_skill = ref('')
-const db = getFirestore()
-const user = ref(getAuth().currentUser)
-
-async function addSkill() {
-  if (!new_skill.value.trim()) {
-    alert("No skill entered")
-    return
-  }
-
-  if (!user.value) {
-    alert("User not authenticated")
-    return
-  }
-
-  try {
-    await setDoc(doc(db, "users", user.value.uid), {
-      skills: arrayUnion(new_skill.value.trim())
-    }, { merge: true })
-
-    console.log(`Skill added: ${new_skill.value} successfully`)
-    new_skill.value = '' // Clear input after adding
-  } catch (err) {
-    console.error("Error adding skill:", err.message)
-  }
-}
+const { newSkill, level, addSkill } = useAddSkill()
 </script>
 
-
-
 <style scoped>
-
+/* Optional extra styling */
+h2 {
+  font-weight: bold;
+}
 </style>

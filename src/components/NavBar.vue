@@ -38,13 +38,13 @@
           </router-link>
         </template>
         <template v-else>
-          <router-link v-if="userInfo && userInfo.uid" :to="`/projects/${userInfo?.uid}`" class="nature-nav-item d-flex align-items-center mb-2 p-2">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/projects`" class="nature-nav-item d-flex align-items-center mb-2 p-2">
             <i class="bi bi-person-circle me-3"></i>
-            <span>View Projects</span>
+            <span>My Projects</span>
           </router-link>
-          <router-link to="/notifs" class="nature-nav-item d-flex align-items-center mb-2 p-2">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${user?.uid}/skill-tracker`" class="nature-nav-item d-flex align-items-center mb-2 p-2">
             <i class="bi bi-bell me-3"></i>
-            <span>Notifications</span>
+            <span>Skills Tracker</span>
           </router-link>
           <button @click="logout" class="nature-nav-item logout-btn d-flex align-items-center mb-2 p-2 w-100 text-start">
             <i class="bi bi-box-arrow-right me-3 text-warning"></i>
