@@ -42,7 +42,7 @@
             <i class="bi bi-person-circle me-3"></i>
             <span>My Projects</span>
           </router-link>
-          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${user?.uid}/skill-tracker`" class="nature-nav-item d-flex align-items-center mb-2 p-2">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/skill-tracker`" class="nature-nav-item d-flex align-items-center mb-2 p-2">
             <i class="bi bi-bell me-3"></i>
             <span>Skills Tracker</span>
           </router-link>
@@ -69,8 +69,8 @@
   
   
   <script setup>
-  import { inject, onMounted, onUnmounted } from 'vue'
-  import { onAuthStateChanged, signOut } from 'firebase/auth'
+  import { inject, onMounted } from 'vue'
+  import { signOut } from 'firebase/auth'
   import { auth, db } from '@/firebase'
   import { useRouter } from 'vue-router'
   import { doc, updateDoc } from 'firebase/firestore'
@@ -90,34 +90,9 @@
     }
   })
   
-  onAuthStateChanged(auth, async (user) => {
-    if (user === null) return;
-    try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        isOnline: true
-      });
-      await router.push('/')
-    } catch (err) {
-      console.log('Error while setting presence:', err)
-    }
-  });
-  
-  onUnmounted(async () => {
-    try {
-      await updateDoc(doc(db, 'users', auth.currentUser.uid), {
-        isOnline: false
-      });
-      await router.push('/')
-    } catch (err) {
-      console.log('Error while setting presence:', err)
-    }
-  });
   
   const logout = async () => {
     try {
-      await updateDoc(doc(db, 'users', auth.currentUser.uid), {
-        isOnline: false
-      });
       await signOut(auth)
       console.log('Logged out successfully')
       await router.push('/')
