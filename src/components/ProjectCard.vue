@@ -78,7 +78,27 @@ function updateProject() {
       </div>
 
       <div v-if="show">
-        <p class="card-text text-muted small mb-2">
+
+        <div v-if="user && (user.uid === props.userId)" @click="editing = !editing" class="d-flex gap-2 mt-3">
+          <button
+            class="btn btn-sm btn-outline-danger"
+            @click.stop="DeleteProject()"
+            title="Delete project">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-warning"
+            @click.stop="editing = !editing"
+            title="Edit project">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+
+        <div v-if="editing" class="mt-3">
+          <CreateProject @projectUpdated="updateProject" :user-id="user.uid" :project-id="projectId" :editing="true" />
+        </div>
+        <div v-else class="mt-3">
+          <p class="card-text text-muted small mb-2">
           <i class="bi bi-calendar me-1"></i>
           {{ project.date?.toDate?.()?.toLocaleDateString() || new Date(project.date).toLocaleDateString() }}
         </p>
@@ -103,24 +123,6 @@ function updateProject() {
             </span>
           </div>
         </div>
-
-        <div v-if="user && (user.uid === props.userId)" class="d-flex gap-2 mt-3">
-          <button
-            class="btn btn-sm btn-outline-danger"
-            @click.stop="DeleteProject()"
-            title="Delete project">
-            <i class="bi bi-trash-fill"></i>
-          </button>
-          <button
-            class="btn btn-sm btn-outline-warning"
-            @click.stop="editing = !editing"
-            title="Edit project">
-            <i class="bi bi-pencil-fill"></i>
-          </button>
-        </div>
-
-        <div v-if="editing" class="mt-3">
-          <CreateProject @projectUpdated="updateProject" :user-id="user.uid" :project-id="projectId" :editing="true" />
         </div>
       </div>
     </div>
