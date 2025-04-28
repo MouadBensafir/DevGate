@@ -22,7 +22,7 @@
 import NavBar from "@/components/NavBar.vue"
 import { ref, watch, provide } from "vue"
 import { getDoc, doc } from "firebase/firestore"
-import { db } from "@/firebase" 
+import { db } from "@/firebase"
 import getUser from "@/composables/getUser"
 
 const { user } = getUser()
