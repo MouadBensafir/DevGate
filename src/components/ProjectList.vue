@@ -7,17 +7,17 @@
           <button
             class="btn view-toggle-btn"
             @click="toggleDisplayMode"
-            :title="displayMode === 'list' ? 'Switch to Gallery View' : 'Switch to List View'"
+            :title="displayMode ? 'Switch to Gallery View' : 'Switch to List View'"
           >
-            <i class="bi" :class="displayMode === 'list' ? 'bi-grid' : 'bi-list'"></i>
-            {{ displayMode === 'list' ? 'Gallery' : 'List' }}
+            <i class="bi" :class="displayMode ? 'bi-grid' : 'bi-list'"></i>
+            {{ displayMode ? 'Gallery' : 'List' }}
           </button>
         </div>
       </div>
       
       <div v-if="projects.length > 0">
         <!-- List Mode -->
-        <div v-if="displayMode === 'list'" class="project-board bg-white rounded-4 shadow">
+        <div v-if="displayMode" class="project-board bg-white rounded-4 shadow">
           <div class="list-group list-group-flush">
             <div v-for="project in projects" :key="project.id" class="list-item">
               <ProjectItem @projectDeleted="fetchProjects" :userId="userId" :projectId="project.id"/>
@@ -57,7 +57,7 @@ const props = defineProps({
   }
 });
 
-const displayMode = ref('list'); // 'list' or 'gallery'
+const displayMode = ref(false); // 'list' or 'gallery'
 const projects = ref([]);
 
 async function fetchProjects() {
@@ -75,7 +75,7 @@ onMounted(async () => {
 });
 
 function toggleDisplayMode() {
-  displayMode.value = displayMode.value === 'list' ? 'gallery' : 'list';
+  displayMode.value = !displayMode.value ;
 }
 </script>
 
