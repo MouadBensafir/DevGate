@@ -1,10 +1,12 @@
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { getFirestore, doc, setDoc } from 'firebase/firestore'
 
 export default function useGoogleLogin() {
   const error = ref(null)
   const successMessage = ref(null)
+  const router = useRouter()
 
   const loginWithGoogle = async () => {
     const auth = getAuth()
@@ -24,6 +26,7 @@ export default function useGoogleLogin() {
         profilePicture: user.photoURL,
       }, { merge: true })
 
+      await router.push('/')
       successMessage.value = `Welcome ${user.displayName}!`
     } catch (err) {
       error.value = err.message

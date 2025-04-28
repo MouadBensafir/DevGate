@@ -4,60 +4,79 @@
     <div v-if="skillList.length" class="skills-content py-5 flex-grow-1">
       <h1 class="text-white mb-4 fw-bold"><i class="bi bi-stars me-2"></i>My Skills</h1>
       
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        <div v-for="skill in skillList" :key="skill.id" class="col">
-          <div class="skill-card card h-100 border-0 shadow rounded-4" 
-               :class="{'skill-beginner': skill.level === 'beginner', 
-                       'skill-intermediate': skill.level === 'intermediate', 
-                       'skill-advanced': skill.level === 'advanced'}">
-            <div class="card-header border-0 bg-transparent d-flex justify-content-between pt-3 px-3">
-              <span class="badge" :class="{
-                'bg-info': skill.level === 'beginner',
-                'bg-primary': skill.level === 'intermediate',
-                'bg-success': skill.level === 'advanced'
-              }">{{ skill.level }}</span>
-              <div class="dropdown">
-                <button class="btn btn-sm dropdown-toggle text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-three-dots-vertical"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li><button class="dropdown-item" @click="upgradeLevel(skill.id)">
-                    <i class="bi bi-arrow-up-circle me-2"></i>Améliorer
-                  </button></li>
-                  <li><button class="dropdown-item text-danger" @click="deleteSkill(skill.id)">
-                    <i class="bi bi-trash me-2"></i>Supprimer
-                  </button></li>
-                </ul>
-              </div>
-            </div>
-            <div class="card-body p-4">
-              <h5 class="card-title fw-bold mb-3">{{ skill.name }}</h5>
-              <div class="skill-level-progress mb-3">
-                <div class="progress" style="height: 8px;">
-                  <div class="progress-bar" :class="{
-                    'bg-info w-25': skill.level === 'beginner',
-                    'bg-primary w-50': skill.level === 'intermediate',
-                    'bg-success w-100': skill.level === 'advanced'
-                  }" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-              </div>
-              <p class="card-text text-muted d-flex align-items-center">
-                <i class="bi bi-clock me-2"></i>
-                <small>Acquis il y a {{ getTimeAgo(skill.createdAt) }}</small>
-              </p>
-            </div>
-          </div>
+      <div class="skill-board bg-white rounded-4 shadow p-4">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Skill Name</th>
+                <th scope="col">Level</th>
+                <th scope="col">Progress Bar</th>
+                <th scope="col">Acquisition Date</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="skill in skillList" :key="skill.id" 
+                  :class="{
+                    'skill-beginner': skill.level === 'beginner', 
+                    'skill-intermediate': skill.level === 'intermediate', 
+                    'skill-advanced': skill.level === 'advanced',
+                    'skill-expert': skill.level === 'expert'
+                  }">
+                <td class="fw-bold">{{ skill.name }}</td>
+                <td>
+                  <span class="badge" :class="{
+                    'bg-info': skill.level === 'beginner',
+                    'bg-primary': skill.level === 'intermediate',
+                    'bg-success': skill.level === 'advanced',
+                    'bg-danger': skill.level === 'expert'
+                  }">{{ skill.level }}</span>
+                </td>
+                <td class="align-middle" style="width: 25%">
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" :class="{
+                      'bg-info w-25': skill.level === 'beginner',
+                      'bg-primary w-50': skill.level === 'intermediate',
+                      'bg-success w-75': skill.level === 'advanced',
+                      'bg-danger w-100': skill.level === 'expert'
+                    }" role="progressbar"></div>
+                  </div>
+                </td>
+                <td>
+                  <small class="text-muted d-flex align-items-center">
+                    <i class="bi bi-clock me-2"></i>
+                    {{ getTimeAgo(skill.createdAt) }}
+                  </small>
+                </td>
+                <td>
+                  <div class="d-flex">
+                    <button class="btn btn-sm btn-outline-primary me-2" @click="upgradeLevel(skill.id)" 
+                           :disabled="skill.level === 'expert'">
+                      <i class="bi bi-arrow-up-circle"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning me-2" @click="downgradeLevel(skill.id)"
+                           :disabled="skill.level === 'beginner'">
+                      <i class="bi bi-arrow-down-circle"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" @click="deleteSkill(skill.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      
+
       <!-- Add Skill Button -->
-      <button @click="showCreateForm = true" v-if="!showCreateForm" 
-              class="btn add-skill-btn mt-5 d-flex align-items-center fw-bold">
+      <button @click="showCreateForm = true" v-if="!showCreateForm" class="btn add-skill-btn mt-4 d-flex align-items-center fw-bold">
         <i class="bi bi-plus-circle-fill me-2"></i> Add a new Skill
       </button>
     </div>
-    
-    <!-- Empty state -->
+
+    <!-- Empty State -->
     <div v-else class="empty-state d-flex flex-column justify-content-center align-items-center py-5 flex-grow-1">
       <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/icons/journal-code.svg" alt="No skills" class="mb-4" width="80" height="80" style="filter: invert(1);">
       <h2 class="text-white mb-3">Commencez à suivre vos compétences</h2>
@@ -80,14 +99,7 @@
             <label for="skill" class="form-label fw-semibold">Compétence</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
-              <input
-                type="text"
-                id="skill"
-                class="form-control"
-                placeholder="Nom de la compétence"
-                v-model="newSkill"
-                required
-              />
+              <input type="text" id="skill" class="form-control" placeholder="Nom de la compétence" v-model="newSkill" required />
             </div>
           </div>
 
@@ -95,16 +107,12 @@
             <label for="level" class="form-label fw-semibold">Niveau</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-bar-chart-fill"></i></span>
-              <select
-                id="level"
-                class="form-select"
-                v-model="level"
-                required
-              >
+              <select id="level" class="form-select" v-model="level" required>
                 <option value="" disabled>Sélectionnez un niveau</option>
                 <option value="beginner">Débutant</option>
                 <option value="intermediate">Intermédiaire</option>
                 <option value="advanced">Avancé</option>
+                <option value="expert">Expert</option>
               </select>
             </div>
           </div>
@@ -146,7 +154,7 @@ const { skillList, fetchSkills } = useFetchSkills(userId)
 onMounted(fetchSkills)
 
 async function skillUpdate() {
-  await addSkill(userId, newSkill.value, level.value)
+  await addSkill(userId, newSkill.value, level.value, aquDate.value)
   showCreateForm.value = false
   await fetchSkills()
 }
@@ -155,7 +163,6 @@ async function deleteSkill(skillId) {
   try {
     await deleteDoc(doc(db, 'users', userId, 'skills', skillId))
     await fetchSkills()
-    console.log(`Skill with ID ${skillId} deleted successfully.`)
   } catch (error) {
     console.error("Error deleting skill:", error)
   }
@@ -168,18 +175,44 @@ async function upgradeLevel(skillId) {
 
     if (skillDoc.exists()) {
       const skillData = skillDoc.data()
-      if (skillData.level === 'advanced') {
+      const levels = ['beginner', 'intermediate', 'advanced', 'expert']
+      const currentIndex = levels.indexOf(skillData.level)
+
+      if (currentIndex === -1 || currentIndex === levels.length - 1) {
         alert("Cette compétence est déjà au niveau maximum.")
         return
       }
-      const newLevel = skillData.level === 'beginner' ? 'intermediate' : 'advanced'
+
+      const newLevel = levels[currentIndex + 1]
       await updateDoc(skillRef, { level: newLevel })
       await fetchSkills()
-    } else {
-      console.log("Document non trouvé !")
     }
   } catch (error) {
     console.error("Erreur lors de l'amélioration de la compétence:", error)
+  }
+}
+
+async function downgradeLevel(skillId) {
+  try {
+    const skillRef = doc(db, 'users', userId, 'skills', skillId)
+    const skillDoc = await getDoc(skillRef)
+
+    if (skillDoc.exists()) {
+      const skillData = skillDoc.data()
+      const levels = ['beginner', 'intermediate', 'advanced', 'expert']
+      const currentIndex = levels.indexOf(skillData.level)
+
+      if (currentIndex === -1 || currentIndex === 0) {
+        alert("Cette compétence est déjà au niveau minimum.")
+        return
+      }
+
+      const newLevel = levels[currentIndex - 1]
+      await updateDoc(skillRef, { level: newLevel })
+      await fetchSkills()
+    }
+  } catch (error) {
+    console.error("Erreur lors de la dégradation de la compétence:", error)
   }
 }
 
@@ -209,47 +242,42 @@ function getTimeAgo(timestamp) {
 </script>
 
 <style scoped>
-/* Thème océan */
+/* Ocean theme */
 .skills-container {
   background-color: #0f2942;
   color: #fff;
 }
 
-/* Styliser les cartes de compétence */
-.skill-card {
+.skill-board {
+  border-left: 5px solid #5b86e5;
   transition: all 0.3s ease;
-  background-color: rgba(255, 255, 255, 0.95);
-  overflow: hidden;
-  position: relative;
 }
 
-.skill-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5px;
+/* Table row styling */
+tbody tr {
+  border-left: 5px solid transparent;
+  transition: all 0.3s ease;
 }
 
-.skill-beginner::before {
-  background-color: #17a2b8; /* info */
+tr.skill-beginner {
+  border-left-color: #17a2b8;
 }
 
-.skill-intermediate::before {
-  background-color: #0d6efd; /* primary */
+tr.skill-intermediate {
+  border-left-color: #0d6efd;
 }
 
-.skill-advanced::before {
-  background-color: #198754; /* success */
+tr.skill-advanced {
+  border-left-color: #198754;
 }
 
-.skill-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+tr.skill-expert {
+  border-left-color: #dc3545;
 }
 
-/* Bouton d'ajout de compétence */
+
+
+/* Button styling */
 .add-skill-btn {
   background: linear-gradient(45deg, #36d1dc, #5b86e5);
   color: white;
@@ -265,7 +293,7 @@ function getTimeAgo(timestamp) {
   transform: translateY(-2px);
 }
 
-/* Formulaire */
+/* Form styling */
 .skill-form {
   background: white;
 }
@@ -280,7 +308,7 @@ function getTimeAgo(timestamp) {
   color: #5b86e5;
 }
 
-/* Animation pour l'apparition du formulaire */
+/* Animation for form appearance */
 .form-overlay {
   animation: fadeIn 0.3s;
 }
@@ -290,10 +318,19 @@ function getTimeAgo(timestamp) {
   to { opacity: 1; }
 }
 
-/* Responsive adjustments */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-  .skill-card {
-    margin-bottom: 15px;
+  .table-responsive {
+    overflow-x: auto;
   }
+}
+
+/* Action buttons hover effect */
+.btn-outline-primary:hover, .btn-outline-warning:hover, .btn-outline-danger:hover {
+  transform: scale(1.1);
+}
+
+.btn-outline-primary, .btn-outline-warning, .btn-outline-danger {
+  transition: all 0.2s ease;
 }
 </style>
