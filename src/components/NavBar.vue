@@ -77,7 +77,6 @@
       <!-- User Info -->
       <div class="ocean-user-info d-flex align-items-center mb-4 p-3">
         <div class="ocean-avatar me-3 position-relative">
-          <div class="ocean-status-indicator" :class="{ 'online': logged_in }"></div>
           <img
             v-if="logged_in && userInfo?.pdp"
             :src="userInfo?.pdp"
@@ -312,17 +311,6 @@ const logout = async () => {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.ocean-status-indicator {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: #ccc;
-  border: 2px solid var(--ocean-deep);
-  z-index: 2;
-}
 
 .ocean-status-indicator.online {
   background-color: #36d1dc;

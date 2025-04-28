@@ -2,7 +2,7 @@
   <div class="d-flex vh-100">
     <!-- Sidebar with fixed width, mobile-friendly vertical navbar -->
     <NavBar class="flex-shrink-0 d-none d-md-block" style="width: 250px;" /> <!-- Sidebar for PC -->
-
+    <TimeLine username="akito-sama"/>
     <!-- Main content takes remaining space -->
     <div class="flex-grow-1 overflow-auto">
       <router-view />
@@ -12,9 +12,10 @@
 
 <script setup>
 import NavBar from "@/components/NavBar.vue"
+import TimeLine from "@/components/TimeLine.vue"
 import { ref, watch, provide } from "vue"
 import { getDoc, doc } from "firebase/firestore"
-import { db } from "@/firebase" 
+import { db } from "@/firebase"
 import getUser from "@/composables/getUser"
 
 const { user } = getUser()
