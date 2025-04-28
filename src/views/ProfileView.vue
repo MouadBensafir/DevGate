@@ -1,129 +1,178 @@
 <template>
-  <h1 class="text-center mt-5">Profile Page</h1>
-  <div class="container mt-4">
-    <div class="row">
-      <div class="col-md-4">
-        <button
-          v-if="user.id === connectedUser?.uid"
-          class="btn btn-outline-primary mb-3"
-          @click="changingProfile = !changingProfile"
-        >
-          <i class="bi bi-pencil-fill"></i>
-          {{ changingProfile ? "Cancel" : "Edit Profile" }}
-        </button>
-        <div v-if="changingProfile" class="mb-3">
-          <label class="form-label text-brown">Profile Picture</label>
-          <div
-            class="upload-box border rounded-3 p-3 text-center position-relative"
-            @dragover.prevent
-            @drop="handleFileDrop"
-            @click="triggerFileInput"
-          >
-            <input
-              type="file"
-              ref="fileInput"
-              class="d-none"
-              @change="handleFileSelect"
-            />
-            <div v-if="!pdp" class="upload-placeholder">
-              <i class="bi bi-person-circle fs-1 text-primary"></i>
-              <p class="text-muted mb-0">Click or drag a profile image</p>
-            </div>
-            <div v-else class="position-relative">
-              <img
-                :src="pdp"
-                alt="Profile Picture"
-                class="img-fluid rounded shadow-sm"
-                style="max-height: 200px; object-fit: cover"
-                width="36"
-                height="36"
-              />
+  <div class="profile-container">
+    <!-- Header Section -->
+    <div class="profile-header text-center mb-5">
+      <h1 class="profile-title">Profile Page</h1>
+      <div class="title-divider"></div>
+    </div>
+
+    <!-- Main Profile Content -->
+    <div class="container profile-content">
+      <div class="row">
+        <!-- Left Column - Profile Picture & Basic Info -->
+        <div class="col-lg-4">
+          <div class="profile-card shadow-sm rounded-4 p-4 mb-4">
+            <!-- Edit Button -->
+            <div v-if="user.id === connectedUser?.uid" class="text-end mb-3">
               <button
-                type="button"
-                class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
-                @click.stop="pdp = ''"
+                class="btn btn-edit"
+                @click="changingProfile = !changingProfile"
               >
-                <i class="bi bi-x-lg"></i>
+                <i class="bi" :class="changingProfile ? 'bi-x-lg' : 'bi-pencil-fill'"></i>
+                {{ changingProfile ? "Cancel" : "Edit Profile" }}
               </button>
             </div>
+
+            <!-- Profile Picture Section -->
+            <div class="profile-picture-section text-center mb-4">
+              <div v-if="changingProfile">
+                <label class="form-label">Profile Picture</label>
+                <div
+                  class="upload-box rounded-3 p-4 text-center"
+                  @dragover.prevent
+                  @drop="handleFileDrop"
+                  @click="triggerFileInput"
+                >
+                  <input
+                    type="file"
+                    ref="fileInput"
+                    class="d-none"
+                    @change="handleFileSelect"
+                  />
+                  <div v-if="!pdp" class="upload-placeholder">
+                    <i class="bi bi-person-plus-fill fs-1"></i>
+                    <p class="mt-2 mb-0">Click or drag to upload</p>
+                  </div>
+                  <div v-else class="position-relative">
+                    <img
+                      :src="pdp"
+                      alt="Profile Picture"
+                      class="img-fluid rounded-circle shadow"
+                      style="width: 180px; height: 180px; object-fit: cover"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle"
+                      @click.stop="pdp = ''"
+                    >
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  class="form-control mt-3"
+                  placeholder="Or enter image URL"
+                  v-model="pdp"
+                />
+              </div>
+              <div v-else class="text-center">
+                <img
+                  :src="user?.pdp || 'https://via.placeholder.com/150'"
+                  alt="Profile Picture"
+                  class="img-fluid rounded-circle shadow mb-3"
+                  style="width: 180px; height: 180px; object-fit: cover"
+                />
+                <h2 class="profile-name">{{ user?.firstname }} {{ user?.lastname }}</h2>
+                <p class="text-muted">{{ user?.email }}</p>
+                <p class="text-muted small">
+                  <i class="bi bi-calendar me-1"></i>
+                  Joined: {{ formatDate(user?.createdAt) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Edit Form Fields -->
+            <div v-if="changingProfile" class="profile-edit-fields">
+              <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input
+                  type="text"
+                  v-model="user.firstname"
+                  class="form-control"
+                  placeholder="First name"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input
+                  type="text"
+                  v-model="user.lastname"
+                  class="form-control"
+                  placeholder="Last name"
+                />
+              </div>
+            </div>
           </div>
-          <small class="form-text text-muted"
-            >Or enter a direct image link below:</small
-          >
-          <input
-            type="text"
-            class="form-control mt-2"
-            placeholder="https://example.com/image.jpg"
-            v-model="pdp"
-          />
         </div>
-        <div v-else>
-          <img
-            :src="user?.pdp"
-            alt="Profile Picture"
-            class="img-fluid rounded-circle mb-3"
-            width="100"
-            height="100"
-          />
+
+        <!-- Right Column - Bio & Additional Info -->
+        <div class="col-lg-8">
+          <div class="profile-card shadow-sm rounded-4 p-4 mb-4 h-100">
+            <h3 class="section-title">
+              <i class="bi bi-person-lines-fill me-2"></i>About
+            </h3>
+            <div v-if="changingProfile">
+              <textarea
+                class="form-control profile-bio"
+                v-model="user.bio"
+                rows="6"
+                placeholder="Tell us about yourself..."
+              ></textarea>
+              <button
+                  class="btn btn-save mt-3"
+                  @click="saveChanges"
+              >
+                <i class="bi bi-save me-2"></i>Save Changes
+              </button>
+            </div>
+            <p v-else class="profile-bio-text">
+              {{ user?.bio || "No bio provided" }}
+            </p>
+          </div>
         </div>
-        <div v-if="changingProfile" class="mb-3">
-          <label for="firstname" class="form-label text-brown"
-            >First Name</label
-          >
-          <input
-            type="text"
-            id="firstname"
-            v-model="user.firstname"
-            class="form-control"
-          />
-          <label for="lastname" class="form-label text-brown">Last Name</label>
-          <input
-            type="text"
-            id="lastname"
-            v-model="user.lastname"
-            class="form-control"
-          />
-        </div>
-        <div v-else>
-          <h2 class="text-center">
-            {{ user?.firstname }} {{ user?.lastname }}
+      </div>
+
+      <!-- Projects Section -->
+      <div class="profile-section mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="section-title">
+            <i class="bi bi-collection me-2"></i>Projects
           </h2>
-          <p class="text-muted text-center">{{ user?.email }}</p>
-          <p class="text-muted text-center">
-            Joined:
-            {{
-              user?.createdAt?.toDate()?.toLocaleDateString() ||
-              new Date(user.createdAt).toLocaleTimeString()
-            }}
-          </p>
+          <router-link
+              :to="{ name: 'projects', params: { userId: userId } }"
+              class="btn btn-view-all"
+          >
+            View All <i class="bi bi-arrow-right ms-1"></i>
+          </router-link>
+        </div>
+
+        <div class="row g-4">
+          <div v-for="project in projects.slice(0, 3)" :key="project.id" class="col-md-4">
+            <ProjectItem :user-id="userId" :project-id="project.id"/>
+          </div>
         </div>
       </div>
-      <div class="col-md-8">
-        <h3>About</h3>
-        <textarea
-          v-if="changingProfile"
-          class="form-control"
-          v-model="user.bio"
-          rows="5"
-        ></textarea>
-        <p v-else class="text-muted">{{ user?.bio }}</p>
+
+      <!-- Skills Section -->
+      <div class="profile-section mt-5">
+        <h2 class="section-title mb-4">
+          <i class="bi bi-tools me-2"></i>Skills
+        </h2>
+        <div class="skills-container">
+          <!-- Skills content would go here -->
+        </div>
       </div>
-      <button
-        v-if="changingProfile"
-        class="btn btn-primary mt-3"
-        @click="saveChanges"
-      >
-        <i class="bi bi-save"></i> Save Changes
-      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, inject, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/firebase";
+import {ref, inject, onMounted} from "vue";
+import {useRoute} from "vue-router";
+import {doc, getDoc, getDocs, collection, updateDoc} from "firebase/firestore";
+import {db} from "@/firebase";
+import ProjectItem from "@/components/ProjectItem.vue";
 
 const connectedUser = inject("userDoc");
 const route = useRoute();
@@ -138,38 +187,57 @@ const user = ref({
 let userId = route.params.userId;
 const pdp = ref("");
 const changingProfile = ref(false);
+const projects = ref([]);
+const skills = ref([]);
+const fileInput = ref(null);
 
+// Format date for display
+function formatDate(date) {
+  if (!date) return "Unknown";
+  const d = date.toDate ? date.toDate() : new Date(date);
+  return d.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
+}
 
 async function fetchUser() {
   try {
-    console.log("hey", userId);
     const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
       user.value = {
         id: userDoc.id,
         ...userDoc.data(),
       };
-      pdp.value = user.value.pdp || ""; // Initialize pdp with current value
+      pdp.value = user.value.pdp || "";
     }
   } catch (error) {
     console.error("Error fetching user:", error);
   }
 }
 
+async function fetchProjectsAndSkills() {
+  try {
+    const projectsSnapshot = await getDocs(collection(db, "users", userId, "projects"));
+    projects.value = projectsSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+
+    const skillsSnapshot = await getDocs(collection(db, "users", userId, "skills"));
+    skills.value = skillsSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
 onMounted(async () => {
   await fetchUser();
+  await fetchProjectsAndSkills();
 });
 
 // File upload handlers
-const fileInput = ref(null);
-
 function triggerFileInput() {
   fileInput.value?.click();
 }
 
 function handleFileSelect(event) {
   const file = event.target.files[0];
-  if (file && file.type.startsWith("image/")) {
+  if (file?.type.startsWith("image/")) {
     const reader = new FileReader();
     reader.onload = () => {
       pdp.value = reader.result;
@@ -181,7 +249,7 @@ function handleFileSelect(event) {
 function handleFileDrop(event) {
   event.preventDefault();
   const file = event.dataTransfer.files[0];
-  if (file && file.type.startsWith("image/")) {
+  if (file?.type.startsWith("image/")) {
     const reader = new FileReader();
     reader.onload = () => {
       pdp.value = reader.result;
@@ -209,150 +277,145 @@ async function saveChanges() {
 </script>
 
 <style scoped>
-.container {
-  background-color: #f8f5f0;
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 8px 16px rgba(139, 109, 59, 0.1);
+.profile-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem 0;
 }
 
-h1 {
-  color: #4a6741;
-  font-family: "Segoe UI", sans-serif;
+.profile-header {
   position: relative;
+  padding-bottom: 1rem;
 }
 
-h1::after {
-  content: "";
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #8b6d3b, #4a6741);
+.profile-title {
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 2.5rem;
+}
+
+.title-divider {
+  height: 4px;
+  width: 100px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  margin: 0 auto;
   border-radius: 2px;
 }
 
-.text-brown {
-  color: #8b6d3b;
+.profile-card {
+  background-color: white;
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.btn-outline-primary {
-  color: #4a6741;
-  border-color: #4a6741;
-  transition: all 0.3s ease;
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
-.btn-outline-primary:hover {
-  background-color: #4a6741;
-  color: #f8f5f0;
-  transform: translateY(-2px);
-}
-
-.upload-box {
-  background-color: #fff;
-  border: 2px dashed #8b6d3b !important;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.upload-box:hover {
-  border-color: #4a6741 !important;
-  background-color: #f8f5f0;
-}
-
-.upload-placeholder {
-  color: #8b6d3b;
-}
-
-.img-fluid {
-  border: 4px solid #f8f5f0;
-  box-shadow: 0 4px 12px rgba(139, 109, 59, 0.15);
-  transition: transform 0.3s ease;
-}
-
-.img-fluid:hover {
-  transform: scale(1.02);
-}
-
-.form-control {
-  border: 2px solid #e0d5c1;
-  border-radius: 8px;
-  padding: 0.75rem;
-  transition: all 0.3s ease;
-}
-
-.form-control:focus {
-  border-color: #8b6d3b;
-  box-shadow: 0 0 0 0.2rem rgba(139, 109, 59, 0.25);
-}
-
-textarea.form-control {
-  background-color: #fff;
-  min-height: 150px;
-}
-
-.btn-primary {
-  background-color: #4a6741;
-  border-color: #4a6741;
-  padding: 0.75rem 2rem;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: #3d5635;
-  border-color: #3d5635;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 103, 65, 0.2);
-}
-
-.btn-danger {
-  background-color: #c77366;
-  border-color: #c77366;
-}
-
-.text-muted {
-  color: #8b6d3b !important;
-  font-size: 0.9rem;
-}
-
-h2 {
-  color: #4a6741;
+.profile-name {
+  color: #2c3e50;
+  font-weight: 600;
   margin-top: 1rem;
 }
 
-h3 {
-  color: #8b6d3b;
-  margin-bottom: 1rem;
-  position: relative;
-  display: inline-block;
+.btn-edit {
+  background-color: transparent;
+  color: #3498db;
+  border: 1px solid #3498db;
+  border-radius: 50px;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.3s ease;
 }
 
-h3::after {
+.btn-edit:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.upload-box {
+  border: 2px dashed #e0e0e0;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+  border-color: #3498db;
+  background-color: #f1f8fe;
+}
+
+.upload-placeholder {
+  color: #7f8c8d;
+}
+
+.profile-bio {
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  resize: none;
+}
+
+.profile-bio-text {
+  color: #34495e;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.btn-save {
+  background-color: #2ecc71;
+  color: white;
+  border-radius: 50px;
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+}
+
+.section-title {
+  color: #2c3e50;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
   content: "";
   position: absolute;
-  bottom: -5px;
+  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #8b6d3b, transparent);
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  border-radius: 3px;
 }
 
-.col-md-4,
-.col-md-8 {
-  padding: 1.5rem;
+.btn-view-all {
+  color: #3498db;
+  background-color: transparent;
+  border: 1px solid #3498db;
+  border-radius: 50px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 1rem;
+.btn-view-all:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+@media (max-width: 992px) {
+  .profile-title {
+    font-size: 2rem;
   }
 
-  .col-md-4,
-  .col-md-8 {
-    padding: 1rem;
+  .profile-card {
+    margin-bottom: 1.5rem;
   }
 }
 </style>
