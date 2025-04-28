@@ -89,7 +89,6 @@
             {{ user?.firstname }} {{ user?.lastname }}
           </h2>
           <p class="text-muted text-center">{{ user?.email }}</p>
-          <p class="text-muted text-center">Birthday: {{ user.birthday }}</p>
           <p class="text-muted text-center">
             Joined:
             {{

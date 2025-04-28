@@ -34,10 +34,10 @@
           </div>
           <div class="d-flex flex-column">
             <span class="ocean-username fw-semibold">
-              {{ logged_in ? userInfo?.firstname : 'Invité' }}
+              {{ logged_in ? userInfo?.firstname : 'Guest' }}
             </span>
             <small class="ocean-useremail text-truncate" style="max-width: 200px;">
-              {{ logged_in ? userInfo?.email : 'Non connecté' }}
+              {{ logged_in ? userInfo?.email : 'Not logged In' }}
             </small>
           </div>
         </div>
@@ -81,6 +81,7 @@
       <!-- User Info -->
       <div class="ocean-user-info d-flex align-items-center mb-4 p-3">
         <div class="ocean-avatar me-3 position-relative">
+          <router-link :to="`/users/${userInfo?.uid}/profile`" class="ocean-avatar-link">
           <img
             v-if="logged_in && userInfo?.pdp"
             :src="userInfo?.pdp"
@@ -92,6 +93,7 @@
           <div v-else class="ocean-guest-avatar d-flex align-items-center justify-content-center">
             <i class="bi bi-person-fill"></i>
           </div>
+        </router-link>
         </div>
         <div class="d-flex flex-column overflow-hidden">
           <span class="ocean-username fw-semibold text-truncate" style="max-width: 140px;">
