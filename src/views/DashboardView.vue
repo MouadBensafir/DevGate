@@ -7,6 +7,9 @@
       <router-link to="/register" class="btn btn-primary btn-lg">Get Started 🎉</router-link>
     </div>
   </div>
+  <div v-else>
+    <h1 class="my-5 mx-5">Welcome To your Dashboard</h1>
+  </div>
 </template>
 
 

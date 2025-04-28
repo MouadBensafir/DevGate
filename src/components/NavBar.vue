@@ -61,7 +61,11 @@
             </router-link>
             <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/skill-tracker`" class="ocean-nav-item d-flex align-items-center mb-2 p-2" @click="mobileMenuOpen = false">
               <i class="bi bi-graph-up me-3"></i>
-              <span>Skills Tracker</span>
+              <span>Skill Tracker</span>
+            </router-link>
+            <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/timeline`" class="ocean-nav-item d-flex align-items-center mb-2 p-2" @click="mobileMenuOpen = false">
+              <i class="bi bi-time me-3"></i>
+              <span>Timeline</span>
             </router-link>
             <button @click="logout" class="ocean-nav-item logout-btn d-flex align-items-center mb-2 p-2 w-100 text-start">
               <i class="bi bi-box-arrow-right me-3"></i>
@@ -119,6 +123,10 @@
           <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/skill-tracker`" class="ocean-nav-item d-flex align-items-center mb-3 p-3">
             <i class="bi bi-graph-up me-3"></i>
             <span>Skills Tracker</span>
+          </router-link>
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/timeline`" class="ocean-nav-item d-flex align-items-center mb-3 p-3">
+            <i class="bi bi-clock me-3"></i>
+            <span>Timeline</span>
           </router-link>
           <button @click="logout" class="ocean-nav-item logout-btn d-flex align-items-center mb-3 p-3 w-100 text-start">
             <i class="bi bi-box-arrow-right me-3"></i>
