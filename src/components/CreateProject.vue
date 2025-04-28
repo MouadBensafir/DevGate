@@ -1,7 +1,6 @@
 <script setup>
-
-import { ref, defineProps, onMounted, defineEmits } from 'vue';
-
+// Original script unchanged
+import { ref, defineProps, onMounted, defineEmits, inject } from 'vue';
 import { addDoc, collection, updateDoc, getDoc, doc } from "firebase/firestore";
 import { useRouter } from 'vue-router';
 import { db } from '../firebase'; // Adjust the path as necessary
@@ -9,6 +8,7 @@ import { db } from '../firebase'; // Adjust the path as necessary
 const addedstack = ref("");
 let existing = ref(true);
 const project = ref({});
+const userInfo = inject("userDoc");
 
 const emit = defineEmits(["projectUpdated"]);
 const props = defineProps({
@@ -129,104 +129,313 @@ function handleFileDrop(event) {
 </script>
 
 <template>
-  <div class="container mt-4">
-    <h1 class="mb-4">{{(editing) ? "Edit project" : "Create new project"}}</h1>
-    <form @submit.prevent="onSubmit" class="needs-validation" novalidate>
-      <div class="mb-3">
-        <label for="name" class="form-label">Project Name:</label>
-        <input type="text" class="form-control" id="name" v-model="project.name" required />
-        <div class="invalid-feedback">Please provide a project name.</div>
+  <div class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h1 class="mb-0">{{(editing) ? "Edit project" : "Create new project"}}</h1>
+        <router-link :to="`/users/${userInfo?.uid}/projects`">
+          <button type="button" class="close-btn">
+            <i class="bi bi-x-lg"></i>
+          </button>
+          </router-link>
       </div>
-      <div class="mb-3">
-        <label for="description" class="form-label">Description:</label>
-        <textarea class="form-control" id="description" v-model="project.description" rows="3" required></textarea>
-        <div class="invalid-feedback">Please provide a description.</div>
-      </div>
-      <div class="mb-3">
-        <div v-if="existing">
-          <label for="stack" class="form-label">Choose a Tech Stack from the suggested stacks:</label>
-        <select v-if="existing" class="form-select" id="stack" v-model="project.stack" multiple size="5">
-          <option v-for="stack in suggestedStacks" :key="stack" :value="stack">
-            {{ stack }}
-          </option>
-        </select>
-        <small class="text-muted">Hold Ctrl/Cmd to select multiple options</small><br>
+      
+      <form @submit.prevent="onSubmit" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="name" class="form-label">Project Name:</label>
+          <input type="text" class="form-control" id="name" v-model="project.name" required />
+          <div class="invalid-feedback">Please provide a project name.</div>
         </div>
-        <button v-if="existing" type="button" class="btn btn-secondary mt-2" @click="existing = !existing">
-          Confirm the stack
-        </button>
-        <div v-if="!existing" class="mt-2">
-          <label :for="addedstack" class="form-label">Specify Other Tech:</label>
-          <input type="text" id="addedstack" v-model="addedstack" class="form-control" placeholder="Enter tech stack" />
-          <button type="button" class="btn btn-secondary mt-2" @click="addStack">Add</button>
+        
+        <div class="mb-3">
+          <label for="description" class="form-label">Description:</label>
+          <textarea class="form-control" id="description" v-model="project.description" rows="3" required></textarea>
+          <div class="invalid-feedback">Please provide a description.</div>
         </div>
-        <h6 class="mt-3">Selected Tech Stack:</h6>
-        <ul class="mt-2">
-          <li v-for="el in project.stack" :key="el">
-            <span class="badge bg-secondary">{{ el }}</span>
-          </li>
-        </ul>
-      <div class="mb-3">
-        <label for="github" class="form-label">GitHub Link:</label>
-        <input type="url" class="form-control" id="github" v-model="project.github" placeholder="https://github.com/username/project" />
-      </div>
-      <div class="mb-4">
-        <label class="form-label">Project Image</label>
-        <div
-          class="upload-box border rounded-3 p-3 text-center position-relative"
-          @dragover.prevent
-          @drop="handleFileDrop"
-          @click="triggerFileInput"
-          style="cursor: pointer;"
-        >
-          <input
-            type="file"
-            ref="fileInput"
-            class="d-none"
-            @change="handleFileSelect"
-          />
-          <div v-if="!project.image" class="upload-placeholder">
-            <i class="bi bi-image fs-1 text-primary"></i>
-            <p class="text-muted mb-0">Click or drag an image here</p>
+        
+        <div class="mb-3">
+          <div v-if="existing">
+            <label for="stack" class="form-label">Choose a Tech Stack from the suggested stacks:</label>
+            <select v-if="existing" class="form-select" id="stack" v-model="project.stack" multiple size="5">
+              <option v-for="stack in suggestedStacks" :key="stack" :value="stack">
+                {{ stack }}
+              </option>
+            </select>
+            <small class="text-muted">Hold Ctrl/Cmd to select multiple options</small><br>
           </div>
-          <div v-else class="position-relative">
-            <img
-              :src="project.image"
-              alt="Project Image"
-              class="img-fluid rounded shadow-sm"
-              style="max-height: 200px; object-fit: cover"
+          
+          <button v-if="existing" type="button" class="btn btn-secondary mt-2" @click="existing = !existing">
+            Confirm the stack
+          </button>
+          
+          <div v-if="!existing" class="mt-2">
+            <label :for="addedstack" class="form-label">Specify Other Tech:</label>
+            <input type="text" id="addedstack" v-model="addedstack" class="form-control" placeholder="Enter tech stack" />
+            <button type="button" class="btn btn-secondary mt-2" @click="addStack">Add</button>
+          </div>
+          
+          <h6 class="mt-3">Selected Tech Stack:</h6>
+          <ul class="mt-2 stack-tags">
+            <li v-for="el in project.stack" :key="el">
+              <span class="badge bg-gradient text-black">{{ el }}</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="mb-3">
+          <label for="github" class="form-label">GitHub Link:</label>
+          <input type="url" class="form-control" id="github" v-model="project.github" placeholder="https://github.com/username/project" />
+        </div>
+        
+        <div class="mb-4">
+          <label class="form-label">Project Image</label>
+          <div
+            class="upload-box border rounded-3 p-3 text-center position-relative"
+            @dragover.prevent
+            @drop="handleFileDrop"
+            @click="triggerFileInput"
+            style="cursor: pointer;"
+          >
+            <input
+              type="file"
+              ref="fileInput"
+              class="d-none"
+              @change="handleFileSelect"
             />
-            <button
-              type="button"
-              class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
-              @click.stop="project.image = ''"
-            >
-              <i class="bi bi-x-lg"></i>
-            </button>
+            <div v-if="!project.image" class="upload-placeholder">
+              <i class="bi bi-image fs-1 text-primary"></i>
+              <p class="text-muted mb-0">Click or drag an image here</p>
+            </div>
+            <div v-else class="position-relative">
+              <img
+                :src="project.image"
+                alt="Project Image"
+                class="img-fluid rounded shadow-sm"
+                style="max-height: 200px; object-fit: cover"
+              />
+              <button
+                type="button"
+                class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                @click.stop="project.image = ''"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <button type="submit" class="btn btn-primary">{{(editing) ? "Edit project" : "Create project"}}</button>
-      </div>
-    </form>
+        
+        <div class="modal-footer">
+          <router-link :to="`/users/${userInfo?.uid}/projects`">
+            <button type="button" class="btn btn-cancel">Cancel</button>
+          </router-link>
+          <button type="submit" class="btn btn-submit">{{(editing) ? "Edit project" : "Create project"}}</button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.upload-box {
-  min-height: 150px;
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 41, 66, 0.8);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-card {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.modal-header h1 {
+  color: white;
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+form {
+  padding: 24px;
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  color: #1a3c5e;
+}
+
+.form-control, .form-select {
+  border: 1px solid #dce1e6;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #5b86e5;
+  box-shadow: 0 0 0 3px rgba(91, 134, 229, 0.15);
+}
+
+.btn-secondary {
+  background: #5b86e5;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #4a75d4;
+  transform: translateY(-2px);
+}
+
+.stack-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.badge.bg-gradient {
+  background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-weight: 500;
+}
+
+.upload-box {
+  border: 2px dashed #dce1e6;
+  border-radius: 12px;
+  min-height: 150px;
   background-color: #f8f9fa;
   transition: all 0.3s ease;
 }
 
 .upload-box:hover {
-  background-color: #e9ecef;
+  border-color: #5b86e5;
+  background-color: rgba(91, 134, 229, 0.05);
 }
 
-.upload-placeholder {
-  padding: 20px;
+.upload-placeholder i {
+  color: #5b86e5;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid #dce1e6;
+  color: #6c757d;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background: #f8f9fa;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(91, 134, 229, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(91, 134, 229, 0.4);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0); 
+  }
+}
+
+/* For smaller screens */
+@media (max-width: 576px) {
+  .modal-card {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .modal-header {
+    padding: 16px 20px;
+  }
+  
+  form {
+    padding: 16px;
+  }
 }
 </style>
