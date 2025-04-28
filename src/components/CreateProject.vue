@@ -137,7 +137,7 @@ function handleFileDrop(event) {
           <button type="button" class="close-btn">
             <i class="bi bi-x-lg"></i>
           </button>
-          </router-link>
+        </router-link>
       </div>
       
       <form @submit.prevent="onSubmit" class="needs-validation" novalidate>

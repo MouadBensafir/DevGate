@@ -44,7 +44,7 @@
       </div>
 
       <div class="ocean-register-prompt mt-4">
-        <p class="text-center mb-2">Already have an account ?</p>
+        <p class="text-center mb-2">Don't have an Account ?</p>
         <router-link to="/register" class="btn ocean-btn-secondary w-100">
           <i class="bi bi-person-plus me-2"></i>Register
         </router-link>
@@ -199,12 +199,13 @@ const forgotPassword = async () => {
 }
 
 .ocean-btn-primary {
-  background: var(--ocean-gradient);
+  background: linear-gradient(135deg, #1a7b9b, #64b5d9);
   border: none;
   padding: 12px 25px;
   border-radius: 8px;
   font-weight: 600;
   letter-spacing: 0.5px;
+  color: white;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(10, 75, 108, 0.1);
 }
@@ -216,9 +217,9 @@ const forgotPassword = async () => {
 }
 
 .ocean-btn-secondary {
-  background-color: var(--ocean-light);
+  background-color: #e6f7ff;
   border: none;
-  color: var(--ocean-dark);
+  color: #0a4b6c;
   padding: 12px 25px;
   border-radius: 8px;
   font-weight: 600;

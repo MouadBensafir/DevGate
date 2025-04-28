@@ -10,61 +10,21 @@
             <thead>
               <tr>
                 <th scope="col">Skill Name</th>
-                <th scope="col">Level</th>
+                <th scope="col" width="200px">Level</th>
                 <th scope="col">Progress Bar</th>
                 <th scope="col">Acquisition Date</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="skill in skillList" :key="skill.id" 
-                  :class="{
-                    'skill-beginner': skill.level === 'beginner', 
-                    'skill-intermediate': skill.level === 'intermediate', 
-                    'skill-advanced': skill.level === 'advanced',
-                    'skill-expert': skill.level === 'expert'
-                  }">
-                <td class="fw-bold">{{ skill.name }}</td>
-                <td>
-                  <span class="badge" :class="{
-                    'bg-info': skill.level === 'beginner',
-                    'bg-primary': skill.level === 'intermediate',
-                    'bg-success': skill.level === 'advanced',
-                    'bg-danger': skill.level === 'expert'
-                  }">{{ skill.level }}</span>
-                </td>
-                <td class="align-middle" style="width: 25%">
-                  <div class="progress" style="height: 8px;">
-                    <div class="progress-bar" :class="{
-                      'bg-info w-25': skill.level === 'beginner',
-                      'bg-primary w-50': skill.level === 'intermediate',
-                      'bg-success w-75': skill.level === 'advanced',
-                      'bg-danger w-100': skill.level === 'expert'
-                    }" role="progressbar"></div>
-                  </div>
-                </td>
-                <td>
-                  <small class="text-muted d-flex align-items-center">
-                    <i class="bi bi-clock me-2"></i>
-                    {{ getTimeAgo(skill.createdAt) }}
-                  </small>
-                </td>
-                <td>
-                  <div class="d-flex">
-                    <button class="btn btn-sm btn-outline-primary me-2" @click="upgradeLevel(skill.id)" 
-                           :disabled="skill.level === 'expert'">
-                      <i class="bi bi-arrow-up-circle"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-warning me-2" @click="downgradeLevel(skill.id)"
-                           :disabled="skill.level === 'beginner'">
-                      <i class="bi bi-arrow-down-circle"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" @click="deleteSkill(skill.id)">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              <SkillItem 
+                v-for="skill in skillList" 
+                :key="skill.id" 
+                :skill="skill"
+                @upgrade="upgradeLevel"
+                @downgrade="downgradeLevel"
+                @delete="deleteSkill"
+              />
             </tbody>
           </table>
         </div>
@@ -139,10 +99,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { Timestamp, doc, deleteDoc, getDoc, updateDoc } from 'firebase/firestore'
+import { doc, deleteDoc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore'
 import { useAddSkill } from '@/composables/useAddSkill'
 import { useFetchSkills } from '@/composables/useFetchSkills'
 import { db } from '@/firebase'
+import SkillItem from '@/components/SkillItem.vue'
 
 const showCreateForm = ref(false)
 const route = useRoute()
@@ -161,8 +122,23 @@ async function skillUpdate() {
 
 async function deleteSkill(skillId) {
   try {
+    const skillRef = doc(db, 'users', userId, 'skills', skillId)
+    const skillDoc = await getDoc(skillRef)
+    const skillData = skillDoc.data()
+    if (!skillData) return
+
     await deleteDoc(doc(db, 'users', userId, 'skills', skillId))
     await fetchSkills()
+
+    // Adding action to the actions collection
+    const actionCollectionRef = collection(db, "users", userId, "actions")
+      await addDoc(actionCollectionRef, {
+        title: skillData.name,
+        type: "skill",
+        action: "delete",
+        date: new Date(),
+        description: `Deleted skill "${skillData.name}"`
+      })
   } catch (error) {
     console.error("Error deleting skill:", error)
   }
@@ -185,6 +161,17 @@ async function upgradeLevel(skillId) {
 
       const newLevel = levels[currentIndex + 1]
       await updateDoc(skillRef, { level: newLevel })
+
+      // Adding action to the actions collection
+      const actionCollectionRef = collection(db, "users", userId, "actions")
+      await addDoc(actionCollectionRef, {
+        title: skillData.name,
+        type: "skill",
+        action: "level up",
+        date: new Date(),
+        description: `Level Up skill "${skillData.name}" to level "${newLevel}"`
+      })
+
       await fetchSkills()
     }
   } catch (error) {
@@ -209,34 +196,20 @@ async function downgradeLevel(skillId) {
 
       const newLevel = levels[currentIndex - 1]
       await updateDoc(skillRef, { level: newLevel })
+      // Adding action to the actions collection
+      const actionCollectionRef = collection(db, "users", userId, "actions")
+      await addDoc(actionCollectionRef, {
+        title: skillData.name,
+        type: "skill",
+        action: "level down",
+        date: new Date(),
+        description: `Level Down skill "${skillData.name}" to level "${newLevel}"`
+      })
+
       await fetchSkills()
     }
   } catch (error) {
     console.error("Erreur lors de la dégradation de la compétence:", error)
-  }
-}
-
-function getTimeAgo(timestamp) {
-  const now = new Date()
-  const createdAt = timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp)
-
-  const diffInMs = now - createdAt
-  const diffInSec = Math.floor(diffInMs / 1000)
-  const diffInMin = Math.floor(diffInSec / 60)
-  const diffInHours = Math.floor(diffInMin / 60)
-  const diffInDays = Math.floor(diffInHours / 24)
-  const diffInMonths = Math.floor(diffInDays / 30)
-
-  if (diffInMonths > 0) {
-    return `${diffInMonths} mois`
-  } else if (diffInDays > 0) {
-    return `${diffInDays} jour${diffInDays > 1 ? 's' : ''}`
-  } else if (diffInHours > 0) {
-    return `${diffInHours} heure${diffInHours > 1 ? 's' : ''}`
-  } else if (diffInMin > 0) {
-    return `${diffInMin} minute${diffInMin > 1 ? 's' : ''}`
-  } else {
-    return `${diffInSec} seconde${diffInSec > 1 ? 's' : ''}`
   }
 }
 </script>
@@ -252,30 +225,6 @@ function getTimeAgo(timestamp) {
   border-left: 5px solid #5b86e5;
   transition: all 0.3s ease;
 }
-
-/* Table row styling */
-tbody tr {
-  border-left: 5px solid transparent;
-  transition: all 0.3s ease;
-}
-
-tr.skill-beginner {
-  border-left-color: #17a2b8;
-}
-
-tr.skill-intermediate {
-  border-left-color: #0d6efd;
-}
-
-tr.skill-advanced {
-  border-left-color: #198754;
-}
-
-tr.skill-expert {
-  border-left-color: #dc3545;
-}
-
-
 
 /* Button styling */
 .add-skill-btn {
@@ -323,14 +272,5 @@ tr.skill-expert {
   .table-responsive {
     overflow-x: auto;
   }
-}
-
-/* Action buttons hover effect */
-.btn-outline-primary:hover, .btn-outline-warning:hover, .btn-outline-danger:hover {
-  transform: scale(1.1);
-}
-
-.btn-outline-primary, .btn-outline-warning, .btn-outline-danger {
-  transition: all 0.2s ease;
 }
 </style>

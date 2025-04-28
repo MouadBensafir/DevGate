@@ -30,6 +30,16 @@ export function useAddSkill() {
         createdAt: aquDateTimestamp
       })
 
+      // Adding action to the actions collection
+      const actionCollectionRef = collection(db, "users", userId, "actions")
+      await addDoc(actionCollectionRef, {
+        title: newSkill.value,
+        type: "skill",
+        action: "add",
+        date: aquDateTimestamp,
+        description: `Added skill "${newSkill.value}" at level "${level.value}"`
+      })
+
       console.log(`Skill "${newSkill.value}" added successfully`)
       newSkill.value = ''
       level.value = ''
