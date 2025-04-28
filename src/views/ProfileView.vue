@@ -120,7 +120,7 @@
 </template>
 
 <script setup>
-import { ref, inject, onMounted, watch } from "vue";
+import { ref, inject, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -135,21 +135,14 @@ const user = ref({
   birthday: null,
   createdAt: null,
 });
-let userId = route.params.id;
+let userId = route.params.userId;
 const pdp = ref("");
 const changingProfile = ref(false);
 
-// Watch router in case the id changes
-watch(
-  () => route.params.id,
-  (newId) => {
-    userId = newId;
-    fetchUser();
-  }
-);
 
 async function fetchUser() {
   try {
+    console.log("hey", userId);
     const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
       user.value = {
