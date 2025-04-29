@@ -9,13 +9,18 @@ import SkillTracker from '../views/SkillTrackerView.vue'
 import Timeline from '../views/TimelineView.vue'
 import NewProjectView from "@/views/NewProjectView.vue";
 import NewObjectiveView from "@/views/NewObjectiveView.vue";
-import Test from "@/views/TestEt.vue"
+import GithubCallback from '@/views/GithubCallback.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: Dashboard
+  },
+  {
+    path: '/auth/github/callback',
+    name: 'github-callback',
+    component: GithubCallback
   },
   {
     path: '/login',

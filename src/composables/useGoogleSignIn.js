@@ -25,7 +25,7 @@ export default function useGoogleSignIn() {
           lastname: user.displayName?.split(' ')[1] || '',
           email: user.email,
           bio: 'No real bio yet',
-          birthday: '',
+          GitHubUsername: '',
           createdAt: new Date(),
           role: "user",
           pdp: user.photoURL || 'https://i.postimg.cc/05zJ6r52/duck-default.png',
@@ -33,6 +33,7 @@ export default function useGoogleSignIn() {
       }
 
       await router.push('/');
+      window.location.reload();
     } catch (err) {
       console.error("Google sign-in error:", err);
       error.value = err.message;
