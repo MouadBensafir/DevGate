@@ -9,6 +9,7 @@ import SkillTracker from '../views/SkillTrackerView.vue'
 import Timeline from '../views/TimelineView.vue'
 import NewProjectView from "@/views/NewProjectView.vue";
 import NewObjectiveView from "@/views/NewObjectiveView.vue";
+import Test from "@/views/TestEt.vue"
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
     path: "/users/:userId/objectives/new",
     name: "new-objective",
     component: NewObjectiveView
+  },
+  {
+    path: "/test",
+    name: "test",
+    component: Test
   }
 ]
 
