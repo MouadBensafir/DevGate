@@ -138,13 +138,13 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 class="section-title">
             <i class="bi bi-collection me-2"></i>Projects
-          </h2>
-          <router-link
+            <router-link
               :to="{ name: 'projects', params: { userId: userId } }"
               class="btn btn-view-all"
           >
             View All <i class="bi bi-arrow-right ms-1"></i>
           </router-link>
+          </h2>
         </div>
 
         <div class="row g-4">
@@ -158,12 +158,21 @@
       <div class="profile-section mt-5">
         <h2 class="section-title mb-4">
           <i class="bi bi-tools me-2"></i>Skills
+          <router-link
+              :to="{ name: 'skill-tracker', params: { userId: userId } }"
+              class="btn btn-view-all"
+          >
+            View All <i class="bi bi-arrow-right ms-1"></i>
+          </router-link>
         </h2>
-        <div class="skills-container">
-          <!-- Skills content would go here -->
-        </div>
       </div>
+      <div class="skills-container">
+          <div v-for="skill in skills" :key="skill.id" class="badge bg-primary me-2 mb-2">
+            <SkillItem :skill="skill"/>
+          </div>
+        </div>
     </div>
+
   </div>
 </template>
 
@@ -173,6 +182,7 @@ import {useRoute} from "vue-router";
 import {doc, getDoc, getDocs, collection, updateDoc} from "firebase/firestore";
 import {db} from "@/firebase";
 import ProjectItem from "@/components/ProjectItem.vue";
+import SkillItem from "@/components/SkillItem.vue";
 
 const connectedUser = inject("userDoc");
 const route = useRoute();
@@ -216,7 +226,7 @@ async function fetchUser() {
 async function fetchProjectsAndSkills() {
   try {
     const projectsSnapshot = await getDocs(collection(db, "users", userId, "projects"));
-    projects.value = projectsSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+    projects.value = projectsSnapshot.docs.map(doc => ({id: doc.id}));
 
     const skillsSnapshot = await getDocs(collection(db, "users", userId, "skills"));
     skills.value = skillsSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
