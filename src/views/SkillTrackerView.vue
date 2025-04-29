@@ -39,10 +39,10 @@
     <!-- Empty State -->
     <div v-else class="empty-state d-flex flex-column justify-content-center align-items-center py-5 flex-grow-1">
       <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/icons/journal-code.svg" alt="No skills" class="mb-4" width="80" height="80" style="filter: invert(1);">
-      <h2 class="text-white mb-3">Commencez à suivre vos compétences</h2>
-      <p class="text-white-50 mb-4 text-center">Ajoutez vos premières compétences pour visualiser votre progression</p>
+      <h2 class="text-white mb-3">Start tracking your skills today!</h2>
+      <p class="text-white-50 mb-4 text-center">Add your first Skills to see your progess</p>
       <button @click="showCreateForm = true" class="btn add-skill-btn">
-        <i class="bi bi-plus-circle-fill me-2"></i> Ajouter une compétence
+        <i class="bi bi-plus-circle-fill me-2"></i> Add a Skill
       </button>
     </div>
 
