@@ -42,6 +42,21 @@ onMounted(async () => {
   }
 });
 
+async function addAction() {
+  try {
+    await addDoc(collection(db, "users", props.userId, "actions"), {
+      action: "add",
+      date: objective.value.startAt,
+      description: 'Added objective ' + objective.value.description,
+      title: objective.value.description,
+      type: "objective"
+    });
+  } catch (error) {
+    console.error("Error adding action: ", error);
+  }
+}
+
+
 const router = useRouter();
 
 async function onSubmit(){
@@ -66,6 +81,7 @@ async function onSubmit(){
         });
   } else {
     objective.value.startAt = Date.now();
+    addAction();
     await addDoc(collection(db, 'users', props.userId, 'objectives'), objective.value)
         .then(() => {
           router.push(`/users/${props.userId}/objectives`);
@@ -73,6 +89,7 @@ async function onSubmit(){
         .catch((error) => {
           console.error('Error adding project:', error);
         });
+
   }
 }
 </script>
