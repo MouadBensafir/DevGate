@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, defineProps, defineEmits } from 'vue';
-import { getDoc, doc, deleteDoc } from 'firebase/firestore'
+import { getDoc, doc, deleteDoc, addDoc, collection, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase';
 import getUser from "@/composables/getUser";
 import CreateObjective from "@/components/CreateObjective.vue";
@@ -66,13 +66,35 @@ function formatDuration(ms) {
   return `${seconds} second${seconds !== 1 ? 's' : ''}`;
 }
 
+async function completeAction() {
+  try {
+    await addDoc(collection(db, "users", props.userId, "actions"), {
+      action: "complete",
+      date: new Date(),
+      description: 'Completed objective ' + objective.value.description,
+      title: objective.value.description,
+      type: "objective"
+    });
+    await updateDoc(doc(db, "users", props.userId, "objectives", props.objectiveId), {
+      completed: true
+    });
+    await fetchObjective();
+  } catch (error) {
+    console.error("Error adding action: ", error);
+  }
+}
+
 function calculateProgress() {
   if (!objective.value?.finishAt || !objective.value?.startAt) return 0;
+  if (objective.value.completed) return 100;
 
   const total = new Date(objective.value.finishAt) - objective.value.startAt;
   const remaining = new Date(objective.value.finishAt) - Date.now();
 
-  if (total <= 0) return 100;
+  if (total <= 0) {
+    completeAction();
+    return 100;
+  }
   if (remaining <= 0) return 100;
 
   return Math.round(((total - remaining) / total) * 100);
@@ -81,7 +103,7 @@ function calculateProgress() {
 
 <template>
   <div class="objective-item mb-4">
-    <div class="card shadow-sm border-0">
+    <div :class="{ 'completed-objective': objective.completed }" class="card shadow-sm border-0">
       <div class="card-header bg-white border-0 py-3">
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="mb-0 text-primary">
@@ -91,6 +113,7 @@ function calculateProgress() {
 
           <div v-if="user && (user.uid === props.userId)" class="btn-group" role="group">
             <button
+                v-if="!editing && !objective.completed"
               class="btn btn-outline-warning btn-sm me-2"
               @click="editing = !editing"
               title="Edit objective"
@@ -138,7 +161,7 @@ function calculateProgress() {
               </div>
             </div>
 
-            <div class="d-flex align-items-center mb-3">
+            <div v-if="!objective.completed" class="d-flex align-items-center mb-3">
               <div class="me-3 text-muted">
                 <i class="bi bi-alarm fs-5"></i>
               </div>
@@ -171,6 +194,14 @@ function calculateProgress() {
                 <small class="fw-semibold">{{ calculateProgress() }}%</small>
                 <small>100%</small>
               </div>
+              <button
+                v-if="!objective.completed"
+                class="btn btn-success btn-sm mt-3"
+                @click="completeAction()"
+                title="Mark as completed"
+                >
+                <i class="bi bi-check-circle-fill"></i> Mark as Completed
+              </button>
             </div>
           </div>
         </div>
@@ -180,6 +211,10 @@ function calculateProgress() {
 </template>
 
 <style scoped>
+.completed-objective {
+  background-color: #d4edda; /* Light green background */
+}
+
 .objective-item {
   transition: all 0.3s ease;
 }
