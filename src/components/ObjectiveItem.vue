@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, defineProps, defineEmits } from 'vue';
-import { getDoc, doc, deleteDoc, addDoc, collection, updateDoc, Timestamp } from 'firebase/firestore'
+import { getDoc, doc, deleteDoc, addDoc, collection, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase';
 import getUser from "@/composables/getUser";
 import CreateObjective from "@/components/CreateObjective.vue";
@@ -26,13 +26,7 @@ async function fetchObjective() {
   const objectiveDoc = doc(db, "users", props.userId, "objectives", props.objectiveId);
   const docSnap = await getDoc(objectiveDoc);
   if (docSnap.exists()) {
-    const data = docSnap.data();
-    objective.value = {
-      ...data,
-      id: docSnap.id,
-      startAt: data.startAt instanceof Timestamp ? data.startAt.toDate() : new Date(data.startAt),
-      finishAt: data.finishAt instanceof Timestamp ? data.finishAt.toDate() : new Date(data.finishAt),
-    };
+    objective.value = docSnap.data();
   } else {
     console.log('No such document!');
   }
@@ -58,11 +52,9 @@ function updateProject() {
   fetchObjective();
 }
 
-function formatDuration(fromDate, toDate = new Date()) {
-  const ms = toDate - fromDate;
-  if (ms <= 0) return "Expired";
-
-  const seconds = Math.floor(ms / 1000);
+function formatDuration(seconds) {
+  if (seconds < 0) return "Expired";
+  seconds = Math.floor(seconds);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
@@ -92,20 +84,20 @@ async function completeAction() {
 }
 
 function calculateProgress() {
-  const start = objective.value?.startAt;
-  const finish = objective.value?.finishAt;
-
-  if (!start || !finish) return 0;
+  if (!objective.value?.finishAt || !objective.value?.startAt) return 0;
   if (objective.value.completed) return 100;
 
-  const total = finish - start;
-  const elapsed = Date.now() - start;
+  const total = new Date(objective.value.finishAt) - objective.value.startAt;
+  const remaining = new Date(objective.value.finishAt) - (Date.now() / 1000);
 
-  if (total <= 0 || elapsed >= total) return 100;
+  if (total <= 0) {
+    completeAction();
+    return 100;
+  }
+  if (remaining <= 0) return 100;
 
-  return Math.round((elapsed / total) * 100);
+  return Math.round(((total - remaining) / total) * 100);
 }
-
 </script>
 
 <template>
@@ -162,8 +154,8 @@ function calculateProgress() {
                 <small class="text-muted d-block">Total Duration</small>
                 <span class="fw-semibold">
                   {{ objective?.finishAt && objective?.startAt
-                        ? formatDuration(objective.startAt, objective.finishAt)
-                        : 'N/A' }}
+                    ? formatDuration(objective.finishAt - objective.startAt)
+                    : 'N/A' }}
                 </span>
               </div>
             </div>
@@ -175,9 +167,9 @@ function calculateProgress() {
               <div>
                 <small class="text-muted d-block">Time Remaining</small>
                 <span class="fw-semibold">
-                  {{ objective?.finishAt && objective?.startAt
-                        ? formatDuration(new Date(), objective.finishAt)
-                        : 'N/A' }}
+                  {{ objective?.finishAt
+                    ? formatDuration(objective.finishAt - (Date.now() / 1000))
+                    : 'N/A' }}
                 </span>
               </div>
             </div>

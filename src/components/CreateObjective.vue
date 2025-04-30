@@ -80,8 +80,9 @@ async function onSubmit(){
           console.error('Error updating project:', error);
         });
   } else {
-    objective.value.startAt = new Date(Date.now());
-    objective.value.finishAt = new Date(objective.value.finishAt);
+    // we convert our date to seconds
+    objective.value.startAt = new Date(Date.now()).getTime() / 1000;
+    objective.value.finishAt = new Date(objective.value.finishAt).getTime() / 1000;
     console.log(objective.value);
     addAction();
     await addDoc(collection(db, 'users', props.userId, 'objectives'), objective.value)
