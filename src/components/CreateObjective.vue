@@ -80,7 +80,9 @@ async function onSubmit(){
           console.error('Error updating project:', error);
         });
   } else {
-    objective.value.startAt = Date.now();
+    objective.value.startAt = new Date(Date.now());
+    objective.value.finishAt = new Date(objective.value.finishAt);
+    console.log(objective.value);
     addAction();
     await addDoc(collection(db, 'users', props.userId, 'objectives'), objective.value)
         .then(() => {
@@ -122,7 +124,7 @@ async function onSubmit(){
           <div class="mb-4">
             <label for="finishAt" class="form-label fw-semibold">Target Completion Date</label>
             <input
-                type="date"
+                type="datetime-local"
                 class="form-control"
                 id="finishAt"
                 v-model="objective.finishAt"
