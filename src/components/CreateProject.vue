@@ -1,12 +1,10 @@
 <script setup>
-// Original script unchanged
-import { ref, defineProps, onMounted, defineEmits, inject } from 'vue';
+import { ref, defineProps, onMounted, defineEmits, inject, computed } from 'vue';
 import { addDoc, collection, updateDoc, getDoc, doc } from "firebase/firestore";
 import { useRouter } from 'vue-router';
 import { db } from '../firebase'; // Adjust the path as necessary
 
 const addedstack = ref("");
-let existing = ref(true);
 const project = ref({});
 const userInfo = inject("userDoc");
 
@@ -49,11 +47,30 @@ onMounted(async () => {
 });
 
 function addStack() {
-  if (addedstack.value && !project.value.stack.includes(addedstack.value)) {
-    project.value.stack.push(addedstack.value);
-    addedstack.value = "";
+  const input = addedstack.value.trim().toLowerCase();
+  if (!input) return;
+
+  if (!project.value.stack.includes(input)) {
+    project.value.stack.push(input);
   }
+
+  addedstack.value = "";
 }
+
+function selectSuggestedStack(stack) {
+  if (!project.value.stack.includes(stack)) {
+    project.value.stack.push(stack);
+  }
+  addedstack.value = "";
+}
+
+const filteredSuggestions = computed(() =>
+  addedstack.value
+    ? suggestedStacks.filter(s =>
+        s.toLowerCase().includes(addedstack.value.trim().toLowerCase())
+      )
+    : []
+);
 
 const suggestedStacks = [
     'vuejs',
@@ -139,41 +156,51 @@ function handleFileDrop(event) {
           </button>
         </router-link>
       </div>
-      
+
       <form @submit.prevent="onSubmit" class="needs-validation" novalidate>
         <div class="mb-3">
           <label for="name" class="form-label">Project Name:</label>
           <input type="text" class="form-control" id="name" v-model="project.name" required />
           <div class="invalid-feedback">Please provide a project name.</div>
         </div>
-        
+
         <div class="mb-3">
           <label for="description" class="form-label">Description:</label>
           <textarea class="form-control" id="description" v-model="project.description" rows="3" required></textarea>
           <div class="invalid-feedback">Please provide a description.</div>
         </div>
-        
+
         <div class="mb-3">
-          <div v-if="existing">
-            <label for="stack" class="form-label">Choose a Tech Stack from the suggested stacks:</label>
-            <select v-if="existing" class="form-select" id="stack" v-model="project.stack" multiple size="5">
-              <option v-for="stack in suggestedStacks" :key="stack" :value="stack">
-                {{ stack }}
-              </option>
-            </select>
-            <small class="text-muted">Hold Ctrl/Cmd to select multiple options</small><br>
+          <label for="stack" class="form-label">Add Tech Stack:</label>
+          <input
+            type="text"
+            id="addedstack"
+            v-model="addedstack"
+            class="form-control"
+            placeholder="Type to search or add..."
+          />
+        
+          <!-- Suggestions -->
+          <div v-if="filteredSuggestions.length" class="list-group mt-2">
+            <button
+              type="button"
+              class="list-group-item list-group-item-action"
+              v-for="stack in filteredSuggestions"
+              :key="stack"
+              @click="selectSuggestedStack(stack)"
+            >
+              {{ stack }}
+            </button>
           </div>
-          
-          <button v-if="existing" type="button" class="btn btn-secondary mt-2" @click="existing = !existing">
-            Confirm the stack
-          </button>
-          
-          <div v-if="!existing" class="mt-2">
-            <label :for="addedstack" class="form-label">Specify Other Tech:</label>
-            <input type="text" id="addedstack" v-model="addedstack" class="form-control" placeholder="Enter tech stack" />
-            <button type="button" class="btn btn-secondary mt-2" @click="addStack">Add</button>
+        
+          <!-- Add custom if not in suggestions -->
+          <div v-if="addedstack && !filteredSuggestions.includes(addedstack.trim().toLowerCase())" class="mt-2">
+            <button type="button" class="btn btn-secondary" @click="addStack">
+              Add "{{ addedstack }}"
+            </button>
           </div>
-          
+        
+          <!-- Display selected stacks -->
           <h6 class="mt-3">Selected Tech Stack:</h6>
           <ul class="mt-2 stack-tags">
             <li v-for="el in project.stack" :key="el">
@@ -181,12 +208,12 @@ function handleFileDrop(event) {
             </li>
           </ul>
         </div>
-        
+
         <div class="mb-3">
           <label for="github" class="form-label">GitHub Link:</label>
           <input type="url" class="form-control" id="github" v-model="project.github" placeholder="https://github.com/username/project" />
         </div>
-        
+
         <div class="mb-4">
           <label class="form-label">Project Image</label>
           <div
@@ -223,7 +250,7 @@ function handleFileDrop(event) {
             </div>
           </div>
         </div>
-        
+
         <div class="modal-footer">
           <router-link :to="`/users/${userInfo?.uid}/projects`">
             <button type="button" class="btn btn-cancel">Cancel</button>

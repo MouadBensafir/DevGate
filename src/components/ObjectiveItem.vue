@@ -52,10 +52,9 @@ function updateProject() {
   fetchObjective();
 }
 
-function formatDuration(ms) {
-  if (ms < 0) return "Expired";
-
-  const seconds = Math.floor(ms / 1000);
+function formatDuration(seconds) {
+  if (seconds < 0) return "Expired";
+  seconds = Math.floor(seconds);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
@@ -89,7 +88,7 @@ function calculateProgress() {
   if (objective.value.completed) return 100;
 
   const total = new Date(objective.value.finishAt) - objective.value.startAt;
-  const remaining = new Date(objective.value.finishAt) - Date.now();
+  const remaining = new Date(objective.value.finishAt) - (Date.now() / 1000);
 
   if (total <= 0) {
     completeAction();
@@ -155,7 +154,7 @@ function calculateProgress() {
                 <small class="text-muted d-block">Total Duration</small>
                 <span class="fw-semibold">
                   {{ objective?.finishAt && objective?.startAt
-                    ? formatDuration(new Date(objective.finishAt) - objective.startAt)
+                    ? formatDuration(objective.finishAt - objective.startAt)
                     : 'N/A' }}
                 </span>
               </div>
@@ -169,7 +168,7 @@ function calculateProgress() {
                 <small class="text-muted d-block">Time Remaining</small>
                 <span class="fw-semibold">
                   {{ objective?.finishAt
-                    ? formatDuration(new Date(objective.finishAt) - Date.now())
+                    ? formatDuration(objective.finishAt - (Date.now() / 1000))
                     : 'N/A' }}
                 </span>
               </div>
