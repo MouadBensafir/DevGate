@@ -6,6 +6,8 @@ import { db } from '../firebase';
 
 const objective = ref({});
 const emit = defineEmits(["objectiveUpdated"]);
+const finishAt = ref("");
+const oldFinishAt = ref(0);
 const props = defineProps({
   userId: {
     type: String,
@@ -28,6 +30,7 @@ onMounted(async () => {
         id: docSnap.id,
         ...docSnap.data()
       };
+      oldFinishAt.value = objective.value.finishAt;
     }
     else {
       console.error("No such document!");
@@ -70,7 +73,20 @@ async function onSubmit(){
     return;
   }
 
+  if (!finishAt.value) {
+    alert ("Entrez une date valide");
+    return;
+  }
   if (props.editing){
+    console.log("je suis la")
+    await addDoc(collection(db, "users", props.userId, "actions"), {
+      action: "edit",
+      date: new Date(),
+      description: 'Edited objective target completion date from: ' + new Date(1000 * oldFinishAt.value).toLocaleDateString() + ' to: ' + new Date(finishAt.value).toLocaleDateString(),
+      title: objective.value.description,
+      type: "objective"
+    });
+    objective.value.finishAt = Math.floor(new Date(finishAt.value).getTime() / 1000);
     const objectiveRef = doc(db, 'users', props.userId, 'objectives', objective.value.id);
     await updateDoc(objectiveRef, objective.value)
         .then(() => {
@@ -80,11 +96,10 @@ async function onSubmit(){
           console.error('Error updating project:', error);
         });
   } else {
-    // we convert our date to seconds
-    objective.value.startAt = new Date(Date.now()).getTime() / 1000;
-    objective.value.finishAt = Math.floor(new Date(objective.value.finishAt).getTime() / 1000);
+    objective.value.startAt = Math.floor(new Date(Date.now()).getTime() / 1000);
+    objective.value.finishAt = Math.floor(new Date(finishAt.value).getTime() / 1000);
     console.log(objective.value);
-    addAction();
+    await addAction();
     await addDoc(collection(db, 'users', props.userId, 'objectives'), objective.value)
         .then(() => {
           router.push(`/users/${props.userId}/objectives`);
@@ -128,7 +143,7 @@ async function onSubmit(){
                 type="datetime-local"
                 class="form-control"
                 id="finishAt"
-                v-model="objective.finishAt"
+                v-model="finishAt"
                 required
             />
             <div class="invalid-feedback">Please select a valid completion date.</div>
