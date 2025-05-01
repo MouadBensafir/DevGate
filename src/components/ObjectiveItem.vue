@@ -101,107 +101,80 @@ function calculateProgress() {
 </script>
 
 <template>
-  <div class="objective-item mb-4">
-    <div :class="{ 'completed-objective': objective.completed }" class="card shadow-sm border-0">
-      <div class="card-header bg-white border-0 py-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5 class="mb-0 text-primary">
-            <i class="bi bi-bullseye me-2"></i>
-            Objective Details
-          </h5>
-
-          <div v-if="user && (user.uid === props.userId)" class="btn-group" role="group">
-            <button
-                v-if="!editing && !objective.completed"
-              class="btn btn-outline-warning btn-sm me-2"
-              @click="editing = !editing"
-              title="Edit objective"
-            >
-              <i class="bi bi-pencil-fill"></i> Edit
-            </button>
-            <button
-              class="btn btn-outline-danger btn-sm"
-              @click="DeleteObjective()"
-              title="Delete objective"
-            >
-              <i class="bi bi-trash-fill"></i> Delete
-            </button>
-          </div>
+  <div class="objective-item p-2" :class="{'completed-objective': objective.completed}">
+    <div v-if="editing">
+      <CreateObjective
+        @objectiveUpdated="updateProject"
+        :user-id="user.uid"
+        :objective-id="objectiveId"
+        :editing="true"
+      />
+    </div>
+    
+    <div v-else>
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="objective-title mb-0 text-truncate pe-2">{{ objective.description }}</h4>
+        
+        <div v-if="user && (user.uid === props.userId)" class="action-buttons d-flex">
+          <button
+            v-if="!objective.completed"
+            class="btn action-btn edit-btn me-1"
+            @click="editing = !editing"
+            title="Edit objective"
+          >
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+          <button
+            class="btn action-btn delete-btn"
+            @click="DeleteObjective()"
+            title="Delete objective"
+          >
+            <i class="bi bi-trash-fill"></i>
+          </button>
         </div>
       </div>
 
-      <div v-if="editing" class="card-body">
-        <CreateObjective
-          @objectiveUpdated="updateProject"
-          :user-id="user.uid"
-          :objective-id="objectiveId"
-          :editing="true"
-        />
-      </div>
-
-      <div v-else class="card-body">
-        <div class="mb-4">
-          <p class="lead">{{ objective.description }}</p>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
-            <div class="d-flex align-items-center mb-3">
-              <div class="me-3 text-muted">
-                <i class="bi bi-clock-history fs-5"></i>
-              </div>
-              <div>
-                <small class="text-muted d-block">Total Duration</small>
-                <span class="fw-semibold">
-                  {{ objective?.finishAt && objective?.startAt
-                    ? formatDuration(objective.finishAt - objective.startAt)
-                    : 'N/A' }}
-                </span>
-              </div>
-            </div>
-
-            <div v-if="!objective.completed" class="d-flex align-items-center mb-3">
-              <div class="me-3 text-muted">
-                <i class="bi bi-alarm fs-5"></i>
-              </div>
-              <div>
-                <small class="text-muted d-block">Time Remaining</small>
-                <span class="fw-semibold">
-                  {{ objective?.finishAt
-                    ? formatDuration(objective.finishAt - (Date.now() / 1000))
-                    : 'N/A' }}
-                </span>
-              </div>
-            </div>
+      <div class="objective-details mt-2">
+        <div class="d-flex flex-wrap align-items-center">
+          <div class="me-4 d-flex align-items-center status-indicator">
+            <i class="bi me-1" :class="objective.completed ? 'bi-check-circle-fill text-success' : 'bi-clock text-primary'"></i>
+            <span class="status-badge" :class="objective.completed ? 'completed' : 'in-progress'">
+              {{ objective.completed ? 'Completed' : 'In Progress' }}
+            </span>
           </div>
-
-          <div class="col-md-6">
-            <div class="progress-container">
-              <small class="text-muted d-block mb-2">Progress</small>
-              <div class="progress" style="height: 10px;">
-                <div
-                  class="progress-bar bg-success"
-                  role="progressbar"
-                  :style="{ width: calculateProgress() + '%' }"
-                  :aria-valuenow="calculateProgress()"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-              </div>
-              <div class="d-flex justify-content-between mt-2">
-                <small>0%</small>
-                <small class="fw-semibold">{{ calculateProgress() }}%</small>
-                <small>100%</small>
-              </div>
-              <button
-                v-if="!objective.completed"
-                class="btn btn-success btn-sm mt-3"
-                @click="completeAction()"
-                title="Mark as completed"
-                >
-                <i class="bi bi-check-circle-fill"></i> Mark as Completed
-              </button>
+          
+          <div class="me-4 d-flex align-items-center">
+            <i class="bi bi-hourglass-split text-primary me-1"></i>
+            <span class="fw-semibold small">
+              {{ objective?.finishAt 
+                ? objective.completed 
+                  ? formatDuration(objective.finishAt - objective.startAt)
+                  : formatDuration(objective.finishAt - (Date.now() / 1000))
+                : 'N/A' }}
+            </span>
+          </div>
+          
+          <div class="progress-wrapper d-flex align-items-center flex-grow-1">
+            <div class="progress flex-grow-1 me-2" style="height: 6px;">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                :style="{ width: calculateProgress() + '%' }"
+                :aria-valuenow="calculateProgress()"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
             </div>
+            <span class="progress-text fw-semibold small">{{ calculateProgress() }}%</span>
+            
+            <button
+              v-if="!objective.completed"
+              class="btn complete-btn ms-3"
+              @click="completeAction()"
+              title="Mark as completed"
+            >
+              <i class="bi bi-check-circle-fill"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -210,57 +183,143 @@ function calculateProgress() {
 </template>
 
 <style scoped>
-.completed-objective {
-  background-color: #d4edda; /* Light green background */
-}
-
 .objective-item {
-  transition: all 0.3s ease;
+  background-color: white;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  border-left: 3px solid #5b86e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.card {
-  border-radius: 0.75rem;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.objective-item:hover {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
-.card-header {
-  background-color: #f8f9fa;
+.completed-objective {
+  background-color: rgba(54, 209, 220, 0.05);
+  border-left: 3px solid #36d1dc;
 }
 
-.btn-outline-warning {
-  color: #ffc107;
-  border-color: #ffc107;
+.objective-title {
+  color: #1a3c5e;
+  font-weight: 600;
+  font-size: 1.1rem;
+  max-width: 70%;
 }
 
-.btn-outline-warning:hover {
-  color: #212529;
-  background-color: #ffc107;
+.action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
 }
 
-.btn-outline-danger {
+.edit-btn {
+  background-color: rgba(91, 134, 229, 0.1);
+  color: #5b86e5;
+  border: none;
+}
+
+.edit-btn:hover {
+  background-color: rgba(91, 134, 229, 0.2);
+}
+
+.delete-btn {
+  background-color: rgba(220, 53, 69, 0.1);
   color: #dc3545;
-  border-color: #dc3545;
+  border: none;
 }
 
-.btn-outline-danger:hover {
-  color: white;
-  background-color: #dc3545;
+.delete-btn:hover {
+  background-color: rgba(220, 53, 69, 0.2);
 }
 
-.progress-container {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  border-radius: 0.5rem;
+.status-badge {
+  font-size: 0.75rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.status-badge.in-progress {
+  background-color: rgba(91, 134, 229, 0.1);
+  color: #5b86e5;
+}
+
+.status-badge.completed {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.objective-details {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 0.5rem;
+}
+
+.progress-wrapper {
+  min-width: 200px;
 }
 
 .progress {
-  border-radius: 0.25rem;
-  background-color: #e9ecef;
+  border-radius: 3px;
+  background-color: rgba(91, 134, 229, 0.08);
+  overflow: hidden;
+  height: 6px;
 }
 
-.lead {
-  color: #212529;
-  font-weight: 500;
+.progress-bar {
+  background: linear-gradient(45deg, #36d1dc, #5b86e5);
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  color: #1a3c5e;
+  min-width: 35px;
+  text-align: right;
+}
+
+.complete-btn {
+  background: linear-gradient(45deg, #36d1dc, #5b86e5);
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  box-shadow: 0 1px 3px rgba(91, 134, 229, 0.3);
+  transition: all 0.2s ease;
+}
+
+.complete-btn:hover {
+  box-shadow: 0 2px 5px rgba(91, 134, 229, 0.4);
+}
+
+.status-indicator {
+  min-width: 100px;
+}
+
+@media (max-width: 768px) {
+  .objective-title {
+    max-width: 60%;
+    font-size: 1rem;
+  }
+  
+  .progress-wrapper {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  
+  .status-indicator {
+    margin-bottom: 0.5rem;
+  }
 }
 </style>
