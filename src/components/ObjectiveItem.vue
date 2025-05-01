@@ -6,7 +6,7 @@ import getUser from "@/composables/getUser";
 import CreateObjective from "@/components/CreateObjective.vue";
 
 const { user } = getUser();
-let editing = ref(false);
+const editing = ref(false);
 const emit = defineEmits(["objectiveDeleted"]);
 
 const props = defineProps({
@@ -39,6 +39,13 @@ onMounted(async () => {
 async function DeleteObjective() {
   if (confirm("Are you sure you want to delete this objective?")) {
     try {
+      await addDoc(collection(db, "users", props.userId, "actions"), {
+      action: "delete",
+      date: new Date(),
+      description: 'Deleted objective ' + objective.value.description,
+      title: objective.value.description,
+      type: "objective"
+    });
       await deleteDoc(doc(db, "users", props.userId, "objectives", props.objectiveId));
       emit("objectiveDeleted", props.objectiveId);
     } catch (error) {
@@ -47,9 +54,9 @@ async function DeleteObjective() {
   }
 }
 
-function updateProject() {
+async function updateObjective() {
   editing.value = false;
-  fetchObjective();
+  await fetchObjective();
 }
 
 function formatDuration(seconds) {
@@ -66,6 +73,7 @@ function formatDuration(seconds) {
 }
 
 async function completeAction() {
+  if (objective.value.completed) return;
   try {
     await addDoc(collection(db, "users", props.userId, "actions"), {
       action: "complete",
@@ -75,6 +83,7 @@ async function completeAction() {
       type: "objective"
     });
     await updateDoc(doc(db, "users", props.userId, "objectives", props.objectiveId), {
+      ...objective.value,
       completed: true
     });
     await fetchObjective();
@@ -82,6 +91,8 @@ async function completeAction() {
     console.error("Error adding action: ", error);
   }
 }
+
+
 
 function calculateProgress() {
   if (!objective.value?.finishAt || !objective.value?.startAt) return 0;
@@ -132,7 +143,7 @@ function calculateProgress() {
 
       <div v-if="editing" class="card-body">
         <CreateObjective
-          @objectiveUpdated="updateProject"
+          @objectiveUpdated="updateObjective"
           :user-id="user.uid"
           :objective-id="objectiveId"
           :editing="true"
