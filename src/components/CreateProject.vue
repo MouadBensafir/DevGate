@@ -108,6 +108,13 @@ async function onSubmit(){
       console.log('Project added successfully');
       router.push(`/users/${props.userId}/projects`);
     })
+    await addDoc(collection(db, 'users', props.userId, 'actions'), {
+      type: "project",
+      action: "add",
+      date: new Date(),
+      title: project.value.name,
+      description: "Project " + project.value.name + " has been added successfully in the date " + new Date(),
+    })
     .catch((error) => {
       console.error('Error adding project:', error);
     });

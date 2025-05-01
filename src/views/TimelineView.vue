@@ -8,7 +8,7 @@
       <i class="bi bi-github me-2"></i>
       {{ isLoading ? 'Connecting...' : 'Link GitHub Account' }}
     </button>
-
+    <TimeLine :username="userInfo.githubUsername"/>
     <div v-if="error" class="error">
       <p>{{ error }}</p>
     </div>
@@ -17,9 +17,13 @@
 
 <script setup>
 import useLinkGitHub from '@/composables/useLinkGitHub'
+import TimeLine from "@/components/TimeLine.vue"
+import { inject } from 'vue'
 
 const { linkGitHubAccount, error, isLoading } = useLinkGitHub()
+const userInfo = inject('userDoc');
 </script>
+
 
 <style scoped>
 .github-container {
