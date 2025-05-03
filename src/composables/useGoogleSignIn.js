@@ -25,7 +25,7 @@ export default function useGoogleSignIn() {
           lastname: user.displayName?.split(' ')[1] || '',
           email: user.email,
           bio: 'No real bio yet',
-          GitHubUsername: '',
+          githubUsername: '',
           createdAt: new Date(),
           role: "user",
           pdp: user.photoURL || 'https://i.postimg.cc/05zJ6r52/duck-default.png',

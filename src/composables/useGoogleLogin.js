@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
-import { getFirestore, doc, setDoc } from 'firebase/firestore'
 
 export default function useGoogleLogin() {
   const error = ref(null)
@@ -10,7 +9,6 @@ export default function useGoogleLogin() {
 
   const loginWithGoogle = async () => {
     const auth = getAuth()
-    const db = getFirestore()
     const provider = new GoogleAuthProvider()
     error.value = null
     successMessage.value = null
@@ -18,13 +16,6 @@ export default function useGoogleLogin() {
     try {
       const result = await signInWithPopup(auth, provider)
       const user = result.user
-
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        email: user.email,
-        name: user.displayName,
-        profilePicture: user.photoURL,
-      }, { merge: true })
 
       await router.push('/')
       successMessage.value = `Welcome ${user.displayName}!`
