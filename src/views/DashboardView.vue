@@ -1,8 +1,10 @@
 <template>
   <div class="dashboard-container d-flex flex-column px-md-5 px-3" style="min-height: 100vh; background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);">
-    <div v-if="!loggedIn">
-      Welcome to your dashboard! Please log in to view your data.
+    <div v-if="!loggedIn" class="text-center mt-4">
+      <h4 class="alert-heading">Welcome to your dashboard!</h4>
+      <p>Please log in to view your data.</p>
     </div>
+
     <div v-else>
       <!-- Loading State -->
       <div
@@ -35,29 +37,44 @@
           </button>
         </div>
 
-        <div class="dashboard-card h-100 mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="m-0">
-              <i class="bi bi-list me-2"></i>GitHub Timeline
-            </h5>
-          </div>
-          <div class="card-body d-flex align-items-center justify-content-center">
-            <div v-if="userInfo.githubUsername">
-              <TimeLine :username="userInfo.githubUsername" />
-              <div v-if="error" class="error">
-                <p>{{ error }}</p>
+        <!-- Dashboard Grid -->
+        <div class="row g-4">
+           <!-- Skills Bubble Chart -->
+           <div class="col-md-5">
+            <div class="dashboard-card h-60">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">
+                  <i class="bi bi-grid-3x3-gap me-2"></i>Skills Bubble Map
+                </h5>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <BubbleChart :skills="skillsData" />
               </div>
             </div>
           </div>
-        </div>
 
-        
+          <div class="col-md-7">
+            <!--- Github Timeline -------->
+            <div class="dashboard-card h-60 mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">
+                  <i class="bi bi-list me-2"></i>GitHub Timeline
+                </h5>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <div>
+                  <TimeLine :username="userInfo.githubUsername" />
+                  <div v-if="error" class="error">
+                    <p>{{ error }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <!-- Dashboard Grid -->
-        <div class="row g-4">
           <!-- Skills Overview -->
           <div class="col-md-6">
-            <div class="dashboard-card h-100">
+            <div class="dashboard-card h-60">
               <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="m-0">
                   <i class="bi bi-pie-chart-fill me-2"></i>Skills Distribution
@@ -97,23 +114,9 @@
             </div>
           </div>
 
-          <!-- Skills Bubble Chart -->
-          <div class="col-md-7">
-            <div class="dashboard-card h-100">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="m-0">
-                  <i class="bi bi-grid-3x3-gap me-2"></i>Skills Bubble Map
-                </h5>
-              </div>
-              <div class="card-body d-flex align-items-center justify-content-center">
-                <BubbleChart :skills="skillsData" />
-              </div>
-            </div>
-          </div>
-
           <!-- Activity Timeline -->
-          <div class="col-md-5">
-            <div class="dashboard-card h-100">
+          <div>
+            <div class="dashboard-card h-80">
               <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="m-0">
                   <i class="bi bi-activity me-2"></i>Recent Activity
@@ -228,7 +231,6 @@ onMounted(() => {
 }
 
 .dashboard-card:hover {
-  transform: translateY(-5px);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
 }
 
