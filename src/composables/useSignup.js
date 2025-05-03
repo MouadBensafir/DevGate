@@ -46,7 +46,7 @@ const useSignup = () => {
         bio: bio.value,
         birthday: birthday.value,
         createdAt: new Date(),
-        role: "user",
+        githubUsername : '',
         pdp: pdp.value ? pdp.value : 'https://i.postimg.cc/05zJ6r52/duck-default.png', 
       });
 

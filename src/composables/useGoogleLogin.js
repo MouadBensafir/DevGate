@@ -24,6 +24,9 @@ export default function useGoogleLogin() {
         email: user.email,
         name: user.displayName,
         profilePicture: user.photoURL,
+        githubUsername: '',
+        bio: 'No real bio yet',
+        createdAt: new Date(),
       }, { merge: true })
 
       await router.push('/')

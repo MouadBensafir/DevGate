@@ -12,13 +12,15 @@
     <div v-if="error" class="error">
       <p>{{ error }}</p>
     </div>
+    <RealTimeLine :userId="userInfo?.uid"/>
   </div>
 </template>
 
 <script setup>
-import useLinkGitHub from '@/composables/useLinkGitHub'
 import TimeLine from "@/components/TimeLine.vue"
+import RealTimeLine from "@/components/RealTimeLine.vue"
 import { inject } from 'vue'
+import useLinkGitHub from '@/composables/useLinkGitHub'
 
 const { linkGitHubAccount, error, isLoading } = useLinkGitHub()
 const userInfo = inject('userDoc');
