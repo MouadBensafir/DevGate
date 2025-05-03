@@ -419,9 +419,6 @@ onMounted(() => {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.9);  /* More visible text */
   margin-bottom: 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
