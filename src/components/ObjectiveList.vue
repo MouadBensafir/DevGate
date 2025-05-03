@@ -12,14 +12,18 @@ const props = defineProps({
 });
 
 const objectives = ref([]);
+const loading = ref(true);
 
 async function fetchObjectives() {
+  loading.value = true;
   try {
     console.log("Fetching objectives for user ID:", props.userId);
     const querySnapshot = await getDocs(collection(db, "users", props.userId, "objectives"));
     objectives.value = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
   } catch (error) {
     console.error("Error fetching objectives: ", error);
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -45,7 +49,18 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-if="objectives.length > 0" class="objectives-list">
+    <!-- Loading state -->
+    <div v-if="loading" class="loading-container py-4">
+      <div class="loading-spinner mb-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <p class="text-muted mb-0">Loading objectives...</p>
+    </div>
+
+    <!-- Objectives list when data is loaded -->
+    <div v-else-if="objectives.length > 0" class="objectives-list">
       <div v-for="objective in objectives" :key="objective.id" class="mb-2">
         <ObjectiveItem
           @objectiveDeleted="fetchObjectives"
@@ -55,6 +70,7 @@ onMounted(async () => {
       </div>
     </div>
 
+    <!-- Empty state -->
     <div v-else class="empty-objectives text-center py-4">
       <div class="empty-state-icon mb-3">
         <i class="bi bi-bullseye"></i>
@@ -103,6 +119,25 @@ onMounted(async () => {
   color: white;
   font-size: 1.8rem;
   box-shadow: 0 2px 5px rgba(91, 134, 229, 0.3);
+}
+
+/* Loading state styles */
+.loading-container {
+  text-align: center;
+  padding: 2rem 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+}
+
+.spinner-border {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #5b86e5 !important;
 }
 
 h4 {

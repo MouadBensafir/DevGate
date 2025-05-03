@@ -92,8 +92,6 @@ async function completeAction() {
   }
 }
 
-
-
 function calculateProgress() {
   if (!objective.value?.finishAt || !objective.value?.startAt) return 0;
   if (objective.value.completed) return 100;
@@ -112,72 +110,48 @@ function calculateProgress() {
 </script>
 
 <template>
-  <div class="objective-item mb-4">
+  <div class="objective-item mb-3">
     <div :class="{ 'completed-objective': objective.completed }" class="card shadow-sm border-0">
-      <div class="card-header bg-white border-0 py-3">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5 class="mb-0 text-primary">
-            <i class="bi bi-bullseye me-2"></i>
-            Objective Details
-          </h5>
-
-          <div v-if="user && (user.uid === props.userId)" class="btn-group" role="group">
-            <button
-                v-if="!editing && !objective.completed"
-              class="btn btn-outline-warning btn-sm me-2"
-              @click="editing = !editing"
-              title="Edit objective"
-            >
-              <i class="bi bi-pencil-fill"></i> Edit
-            </button>
-            <button
-              class="btn btn-outline-danger btn-sm"
-              @click="DeleteObjective()"
-              title="Delete objective"
-            >
-              <i class="bi bi-trash-fill"></i> Delete
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="editing" class="card-body">
-        <CreateObjective
-          @objectiveUpdated="updateObjective"
-          :user-id="user.uid"
-          :objective-id="objectiveId"
-          :editing="true"
-        />
-      </div>
-
-      <div v-else class="card-body">
-        <div class="mb-4">
-          <p class="lead">{{ objective.description }}</p>
-        </div>
-      </div>
-
-      <div class="objective-details mt-2">
-        <div class="d-flex flex-wrap align-items-center">
-          <div class="me-4 d-flex align-items-center status-indicator">
-            <i class="bi me-1" :class="objective.completed ? 'bi-check-circle-fill text-success' : 'bi-clock text-primary'"></i>
-            <span class="status-badge" :class="objective.completed ? 'completed' : 'in-progress'">
-              {{ objective.completed ? 'Completed' : 'In Progress' }}
-            </span>
-          </div>
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <!-- Prominent title -->
+          <h3 class="objective-title mb-0">
+            {{ objective.description }}
+          </h3>
           
-          <div class="me-4 d-flex align-items-center">
-            <i class="bi bi-hourglass-split text-primary me-1"></i>
-            <span class="fw-semibold small">
+          <!-- Complete button - kept prominently -->
+          <button
+            v-if="!objective.completed"
+            class="complete-btn"
+            @click="completeAction()"
+            title="Mark as completed"
+          >
+            <i class="bi bi-check-lg"></i>
+          </button>
+        </div>
+        
+        <!-- Info row with progress bar aligned -->
+        <div class="d-flex align-items-center objective-info">
+          <!-- Status badge -->
+          <span class="status-badge me-3" :class="objective.completed ? 'completed' : 'in-progress'">
+            {{ objective.completed ? 'Completed' : 'In Progress' }}
+          </span>
+          
+          <!-- Time indicator -->
+          <div class="time-indicator d-flex align-items-center me-3">
+            <i class="bi bi-clock me-1"></i>
+            <span class="time-text">
               {{ objective?.finishAt 
                 ? objective.completed 
                   ? formatDuration(objective.finishAt - objective.startAt)
                   : formatDuration(objective.finishAt - (Date.now() / 1000))
-                : 'N/A' }}
+                : 'No deadline' }}
             </span>
           </div>
           
+          <!-- Progress bar that fills remaining space -->
           <div class="progress-wrapper d-flex align-items-center flex-grow-1">
-            <div class="progress flex-grow-1 me-2" style="height: 6px;">
+            <div class="progress me-2">
               <div
                 class="progress-bar"
                 role="progressbar"
@@ -187,18 +161,38 @@ function calculateProgress() {
                 aria-valuemax="100"
               ></div>
             </div>
-            <span class="progress-text fw-semibold small">{{ calculateProgress() }}%</span>
-            
+            <span class="progress-text">{{ calculateProgress() }}%</span>
+          </div>
+          
+          <!-- Action buttons -->
+          <div v-if="user && (user.uid === props.userId)" class="action-buttons ms-2">
             <button
-              v-if="!objective.completed"
-              class="btn complete-btn ms-3"
-              @click="completeAction()"
-              title="Mark as completed"
+              v-if="!editing && !objective.completed"
+              class="btn btn-sm edit-btn me-1"
+              @click="editing = !editing"
+              title="Edit objective"
             >
-              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button
+              class="btn btn-sm delete-btn"
+              @click="DeleteObjective()"
+              title="Delete objective"
+            >
+              <i class="bi bi-trash-fill"></i>
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- Edit mode -->
+      <div v-if="editing" class="card-body pt-0">
+        <CreateObjective
+          @objectiveUpdated="updateObjective"
+          :user-id="user.uid"
+          :objective-id="objectiveId"
+          :editing="true"
+        />
       </div>
     </div>
   </div>
@@ -206,55 +200,51 @@ function calculateProgress() {
 
 <style scoped>
 .objective-item {
-  background-color: white;
-  border-radius: 6px;
   transition: all 0.2s ease;
-  border-left: 3px solid #5b86e5;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.objective-item:hover {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+.card {
+  border-left: 4px solid #0077B6; /* Ocean blue border */
+  box-shadow: 0 1px 3px rgba(0, 119, 182, 0.15);
+  background-color: #fafeff; /* Very subtle blue tint */
+  border-radius: 6px;
 }
 
-.completed-objective {
-  background-color: rgba(54, 209, 220, 0.05);
-  border-left: 3px solid #36d1dc;
+.card:hover {
+  box-shadow: 0 2px 6px rgba(0, 119, 182, 0.2);
+}
+
+.completed-objective .card {
+  border-left: 4px solid #20B2AA; /* Light sea green */
+  background-color: #f8fffd; /* Very subtle teal tint */
 }
 
 .objective-title {
-  color: #1a3c5e;
-  font-weight: 600;
-  font-size: 1.1rem;
-  max-width: 70%;
+  color: #05445E; /* Deep ocean blue */
+  font-weight: 700;
+  font-size: 1.3rem;
+  max-width: 80%;
+  line-height: 1.2;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: all 0.2s ease;
-  font-size: 0.8rem;
-}
-
-.edit-btn {
-  background-color: rgba(91, 134, 229, 0.1);
-  color: #5b86e5;
+.edit-btn, .delete-btn {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
   border: none;
 }
 
+.edit-btn {
+  background-color: rgba(0, 119, 182, 0.1);
+  color: #0077B6; /* Ocean blue */
+}
+
 .edit-btn:hover {
-  background-color: rgba(91, 134, 229, 0.2);
+  background-color: rgba(0, 119, 182, 0.2);
 }
 
 .delete-btn {
   background-color: rgba(220, 53, 69, 0.1);
   color: #dc3545;
-  border: none;
 }
 
 .delete-btn:hover {
@@ -262,86 +252,106 @@ function calculateProgress() {
 }
 
 .status-badge {
-  font-size: 0.75rem;
-  padding: 1px 6px;
+  font-size: 0.7rem;
+  padding: 1px 8px;
   border-radius: 3px;
   font-weight: 600;
 }
 
 .status-badge.in-progress {
-  background-color: rgba(91, 134, 229, 0.1);
-  color: #5b86e5;
+  background-color: rgba(0, 119, 182, 0.1);
+  color: #0077B6; /* Ocean blue */
 }
 
 .status-badge.completed {
-  background-color: rgba(40, 167, 69, 0.1);
-  color: #28a745;
-}
-
-.objective-details {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  padding-top: 0.5rem;
+  background-color: rgba(32, 178, 170, 0.1);
+  color: #20B2AA; /* Light sea green */
 }
 
 .progress-wrapper {
-  min-width: 200px;
+  min-width: 100px;
 }
 
 .progress {
-  border-radius: 3px;
-  background-color: rgba(91, 134, 229, 0.08);
+  border-radius: 2px;
+  background-color: rgba(173, 216, 230, 0.2); /* Light blue */
   overflow: hidden;
-  height: 6px;
+  height: 4px;
+  flex: 1;
 }
 
 .progress-bar {
-  background: linear-gradient(45deg, #36d1dc, #5b86e5);
+  background: linear-gradient(90deg, #0077B6, #00B4D8); /* Ocean blue gradient */
   transition: width 0.5s ease;
 }
 
 .progress-text {
-  color: #1a3c5e;
-  min-width: 35px;
-  text-align: right;
+  color: #3D5A80;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 30px;
+  white-space: nowrap;
+}
+
+.time-indicator {
+  color: #3D5A80; /* Slate blue */
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.time-text {
+  color: #3D5A80;
+}
+
+.time-indicator i {
+  color: #0077B6; /* Ocean blue */
+  font-size: 0.7rem;
 }
 
 .complete-btn {
-  background: linear-gradient(45deg, #36d1dc, #5b86e5);
+  background: linear-gradient(135deg, #0077B6, #00B4D8); /* Ocean blue gradient */
   color: white;
   border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  box-shadow: 0 1px 3px rgba(91, 134, 229, 0.3);
+  font-size: 1.1rem;
+  box-shadow: 0 2px 5px rgba(0, 119, 182, 0.3);
   transition: all 0.2s ease;
 }
 
 .complete-btn:hover {
-  box-shadow: 0 2px 5px rgba(91, 134, 229, 0.4);
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 119, 182, 0.4);
 }
 
-.status-indicator {
-  min-width: 100px;
+.objective-info {
+  min-height: 28px;
 }
 
 @media (max-width: 768px) {
-  .objective-title {
-    max-width: 60%;
-    font-size: 1rem;
+  .objective-info {
+    flex-wrap: wrap;
+    row-gap: 8px;
   }
   
   .progress-wrapper {
-    margin-top: 0.5rem;
+    order: 3;
     width: 100%;
+    margin-top: 6px;
   }
   
-  .status-indicator {
-    margin-bottom: 0.5rem;
+  .action-buttons {
+    order: 2;
+  }
+  
+  .objective-title {
+    font-size: 1.1rem;
+    max-width: 70%;
   }
 }
 </style>
