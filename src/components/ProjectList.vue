@@ -62,6 +62,7 @@ const projects = ref([]);
 
 async function fetchProjects() {
   try {
+    
     const querySnapshot = await getDocs(collection(db, "users", props.userId, "projects"));
     projects.value = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
     console.log("hada projet", projects.value)

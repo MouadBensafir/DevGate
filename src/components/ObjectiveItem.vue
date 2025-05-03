@@ -6,7 +6,7 @@ import getUser from "@/composables/getUser";
 import CreateObjective from "@/components/CreateObjective.vue";
 
 const { user } = getUser();
-let editing = ref(false);
+const editing = ref(false);
 const emit = defineEmits(["objectiveDeleted"]);
 
 const props = defineProps({
@@ -39,6 +39,13 @@ onMounted(async () => {
 async function DeleteObjective() {
   if (confirm("Are you sure you want to delete this objective?")) {
     try {
+      await addDoc(collection(db, "users", props.userId, "actions"), {
+      action: "delete",
+      date: new Date(),
+      description: 'Deleted objective ' + objective.value.description,
+      title: objective.value.description,
+      type: "objective"
+    });
       await deleteDoc(doc(db, "users", props.userId, "objectives", props.objectiveId));
       emit("objectiveDeleted", props.objectiveId);
     } catch (error) {
@@ -47,9 +54,9 @@ async function DeleteObjective() {
   }
 }
 
-function updateProject() {
+async function updateObjective() {
   editing.value = false;
-  fetchObjective();
+  await fetchObjective();
 }
 
 function formatDuration(seconds) {
@@ -66,6 +73,7 @@ function formatDuration(seconds) {
 }
 
 async function completeAction() {
+  if (objective.value.completed) return;
   try {
     await addDoc(collection(db, "users", props.userId, "actions"), {
       action: "complete",
@@ -75,6 +83,7 @@ async function completeAction() {
       type: "objective"
     });
     await updateDoc(doc(db, "users", props.userId, "objectives", props.objectiveId), {
+      ...objective.value,
       completed: true
     });
     await fetchObjective();
@@ -82,6 +91,8 @@ async function completeAction() {
     console.error("Error adding action: ", error);
   }
 }
+
+
 
 function calculateProgress() {
   if (!objective.value?.finishAt || !objective.value?.startAt) return 0;
@@ -101,36 +112,47 @@ function calculateProgress() {
 </script>
 
 <template>
-  <div class="objective-item p-2" :class="{'completed-objective': objective.completed}">
-    <div v-if="editing">
-      <CreateObjective
-        @objectiveUpdated="updateProject"
-        :user-id="user.uid"
-        :objective-id="objectiveId"
-        :editing="true"
-      />
-    </div>
-    
-    <div v-else>
-      <div class="d-flex justify-content-between align-items-center">
-        <h4 class="objective-title mb-0 text-truncate pe-2">{{ objective.description }}</h4>
-        
-        <div v-if="user && (user.uid === props.userId)" class="action-buttons d-flex">
-          <button
-            v-if="!objective.completed"
-            class="btn action-btn edit-btn me-1"
-            @click="editing = !editing"
-            title="Edit objective"
-          >
-            <i class="bi bi-pencil-fill"></i>
-          </button>
-          <button
-            class="btn action-btn delete-btn"
-            @click="DeleteObjective()"
-            title="Delete objective"
-          >
-            <i class="bi bi-trash-fill"></i>
-          </button>
+  <div class="objective-item mb-4">
+    <div :class="{ 'completed-objective': objective.completed }" class="card shadow-sm border-0">
+      <div class="card-header bg-white border-0 py-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 text-primary">
+            <i class="bi bi-bullseye me-2"></i>
+            Objective Details
+          </h5>
+
+          <div v-if="user && (user.uid === props.userId)" class="btn-group" role="group">
+            <button
+                v-if="!editing && !objective.completed"
+              class="btn btn-outline-warning btn-sm me-2"
+              @click="editing = !editing"
+              title="Edit objective"
+            >
+              <i class="bi bi-pencil-fill"></i> Edit
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              @click="DeleteObjective()"
+              title="Delete objective"
+            >
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="editing" class="card-body">
+        <CreateObjective
+          @objectiveUpdated="updateObjective"
+          :user-id="user.uid"
+          :objective-id="objectiveId"
+          :editing="true"
+        />
+      </div>
+
+      <div v-else class="card-body">
+        <div class="mb-4">
+          <p class="lead">{{ objective.description }}</p>
         </div>
       </div>
 
