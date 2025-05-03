@@ -1,123 +1,127 @@
 <template>
   <div class="dashboard-container d-flex flex-column px-md-5 px-3" style="min-height: 100vh; background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);">
-    
-    <!-- Loading State -->
-    <div
-      v-if="loading"
-      class="loading-state d-flex flex-column justify-content-center align-items-center py-5 flex-grow-1"
-    >
-      <div class="spinner-container mb-4">
-        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-      <h2 class="text-white mb-2">Loading your dashboard...</h2>
-      <p class="text-white-50 text-center">Please wait while we prepare your insights</p>
+    <div v-if="!loggedIn">
+      Welcome to your dashboard! Please log in to view your data.
     </div>
-
-    <!-- Dashboard Content -->
-    <div v-else class="dashboard-content py-4 flex-grow-1">
-      <div class="d-flex justify-content-between align-items-center pt-4 mb-3">
-        <h1 class="mb-0 text-white fw-bold">
-          <i class="bi bi-speedometer2 me-2"></i>My Dashboard
-        </h1>
-        <button
-          v-if="!userInfo.githubUsername"
-          @click="linkGitHubAccount"
-          :disabled="isLoading"
-          class="github-button"
-        >
-          <i class="bi bi-github me-2"></i>
-          {{ isLoading ? 'Connecting...' : 'Link GitHub Account' }}
-        </button>
+    <div v-else>
+      <!-- Loading State -->
+      <div
+        v-if="loading"
+        class="loading-state d-flex flex-column justify-content-center align-items-center py-5 flex-grow-1"
+      >
+        <div class="spinner-container mb-4">
+          <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <h2 class="text-white mb-2">Loading your dashboard...</h2>
+        <p class="text-white-50 text-center">Please wait while we prepare your insights</p>
       </div>
 
-      <div class="dashboard-card h-100 mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="m-0">
-            <i class="bi bi-list me-2"></i>GitHub Timeline
-          </h5>
+      <!-- Dashboard Content -->
+      <div v-else class="dashboard-content py-4 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center pt-4 mb-3">
+          <h1 class="mb-0 text-white fw-bold">
+            <i class="bi bi-speedometer2 me-2"></i>My Dashboard
+          </h1>
+          <button
+            v-if="!userInfo.githubUsername"
+            @click="linkGitHubAccount"
+            :disabled="isLoading"
+            class="github-button"
+          >
+            <i class="bi bi-github me-2"></i>
+            {{ isLoading ? 'Connecting...' : 'Link GitHub Account' }}
+          </button>
         </div>
-        <div class="card-body d-flex align-items-center justify-content-center">
-          <div v-if="userInfo.githubUsername">
-            <TimeLine :username="userInfo.githubUsername" />
-            <div v-if="error" class="error">
-              <p>{{ error }}</p>
-            </div>
+
+        <div class="dashboard-card h-100 mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="m-0">
+              <i class="bi bi-list me-2"></i>GitHub Timeline
+            </h5>
           </div>
-        </div>
-      </div>
-
-      
-
-      <!-- Dashboard Grid -->
-      <div class="row g-4">
-        <!-- Skills Overview -->
-        <div class="col-md-6">
-          <div class="dashboard-card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="m-0">
-                <i class="bi bi-pie-chart-fill me-2"></i>Skills Distribution
-              </h5>
-            </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <SkillLevelChart :skills="skillsData" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Objectives Progress -->
-        <div class="col-md-6">
-          <div class="dashboard-card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="m-0">
-                <i class="bi bi-check2-circle me-2"></i>Objectives Status
-              </h5>
-            </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <PieChartObjectives :objectives="objectivesData" />
+          <div class="card-body d-flex align-items-center justify-content-center">
+            <div v-if="userInfo.githubUsername">
+              <TimeLine :username="userInfo.githubUsername" />
+              <div v-if="error" class="error">
+                <p>{{ error }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Project Timeline -->
-        <div class="col-12">
-          <div class="dashboard-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="m-0">
-                <i class="bi bi-calendar3 me-2"></i>Objectives Timeline
-              </h5>
-            </div>
-            <div class="card-body">
-              <GanttChart :tasks="objectivesData" />
+        
+
+        <!-- Dashboard Grid -->
+        <div class="row g-4">
+          <!-- Skills Overview -->
+          <div class="col-md-6">
+            <div class="dashboard-card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">
+                  <i class="bi bi-pie-chart-fill me-2"></i>Skills Distribution
+                </h5>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <SkillLevelChart :skills="skillsData" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Skills Bubble Chart -->
-        <div class="col-md-7">
-          <div class="dashboard-card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="m-0">
-                <i class="bi bi-grid-3x3-gap me-2"></i>Skills Bubble Map
-              </h5>
-            </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <BubbleChart :skills="skillsData" />
+          <!-- Objectives Progress -->
+          <div class="col-md-6">
+            <div class="dashboard-card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">
+                  <i class="bi bi-check2-circle me-2"></i>Objectives Status
+                </h5>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <PieChartObjectives :objectives="objectivesData" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Activity Timeline -->
-        <div class="col-md-5">
-          <div class="dashboard-card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="m-0">
-                <i class="bi bi-activity me-2"></i>Recent Activity
-              </h5>
+          <!-- Project Timeline -->
+          <div class="col-12">
+            <div class="dashboard-card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">
+                  <i class="bi bi-calendar3 me-2"></i>Objectives Timeline
+                </h5>
+              </div>
+              <div class="card-body">
+                <GanttChart :tasks="objectivesData" />
+              </div>
             </div>
-            <div class="card-body">
-              <RealTimeLine :userId="user?.uid" />
+          </div>
+
+          <!-- Skills Bubble Chart -->
+          <div class="col-md-7">
+            <div class="dashboard-card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">
+                  <i class="bi bi-grid-3x3-gap me-2"></i>Skills Bubble Map
+                </h5>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <BubbleChart :skills="skillsData" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Timeline -->
+          <div class="col-md-5">
+            <div class="dashboard-card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">
+                  <i class="bi bi-activity me-2"></i>Recent Activity
+                </h5>
+              </div>
+              <div class="card-body">
+                <RealTimeLine :userId="user?.uid" />
+              </div>
             </div>
           </div>
         </div>
@@ -146,6 +150,7 @@ const objectivesData = ref([]);
 const loading = ref(true);
 const { user } = getUser();
 const userInfo = inject('userDoc');
+const loggedIn = inject('logged_in');
 
 // Fetch skills
 const fetchSkills = async () => {
