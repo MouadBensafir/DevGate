@@ -1,6 +1,6 @@
 <script setup>
 import {ref, onMounted, defineProps, defineEmits} from 'vue';
-import { getDoc, doc, deleteDoc } from 'firebase/firestore'
+import { getDoc, doc, deleteDoc, addDoc, collection } from 'firebase/firestore'
 import { db } from '../firebase';
 import getUser from "@/composables/getUser";
 import CreateProject from "@/components/CreateProject.vue";
@@ -44,6 +44,13 @@ async function DeleteProject() {
       await deleteDoc(doc(db, "users", props.userId, "projects", props.projectId));
       emit("projectDeleted", props.projectId);
       alert("Project deleted successfully");
+      await addDoc(collection(db, 'users', props.userId, 'actions'), {
+        type: "project",
+        action: "delete",
+        date: new Date(),
+        title: project.value.name,
+        description: "Project " + project.value.name + " has been deleted successfully in the date " + new Date(),
+      });
     } catch (error) {
       console.error("Error deleting project: ", error);
     }

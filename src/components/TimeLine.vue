@@ -1,29 +1,35 @@
 <template>
-  <div class="github-contributions">
-    <div v-if="loading" class="loading">Loading contributions...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else class="calendar-container">
-      <!-- Month name on the left -->
-      <div class="month-label">{{ currentMonthName }}</div>
-
-      <!-- Calendar grid -->
-      <div class="calendar-grid">
-        <!-- Day names header -->
-        <div class="day-names">
-          <div v-for="day in dayNames" :key="day" class="day-name">
-            {{ day }}
+  <div class="github-contributions-container">
+    <div class="github-contributions">
+      <div v-if="loading" class="loading">Loading contributions...</div>
+      <div v-else-if="error" class="error">{{ error }}</div>
+      <div v-else>
+        <!-- Month Labels -->
+        <div class="month-labels">
+          <div v-for="(month, index) in monthLabels" :key="index" class="month-label">
+            {{ month }}
           </div>
         </div>
 
-        <!-- Contribution grid -->
-        <div class="contribution-grid">
-          <div 
-            v-for="(day, index) in calendarDays" 
-            :key="index" 
-            class="contribution-day"
-            :class="getContributionClass(day)"
-            :title="getTooltip(day)"
-          ></div>
+        <!-- Calendar grid -->
+        <div class="calendar">
+          <!-- Day Names -->
+          <div class="day-names">
+            <div v-for="day in dayNames" :key="day" class="day-name">{{ day }}</div>
+          </div>
+
+          <!-- Weeks -->
+          <div class="weeks">
+            <div v-for="(week, weekIndex) in weeks" :key="weekIndex" class="week">
+              <div 
+                v-for="(day, dayIndex) in week" 
+                :key="dayIndex" 
+                class="day" 
+                :class="getContributionClass(day)"
+                :title="getTooltip(day)"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -31,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, defineProps } from 'vue'
+import { ref, computed, onMounted, defineProps, watch } from 'vue'
 import axios from 'axios'
 
 const props = defineProps({
@@ -44,93 +50,88 @@ const props = defineProps({
 const loading = ref(false)
 const error = ref(null)
 const yearlyContributions = ref([])
-const currentDate = ref(new Date())
+const today = new Date()
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const numberOfWeeks = 20 // Customize if you want more or fewer weeks
 
-const currentMonthName = computed(() => {
-  return currentDate.value.toLocaleString('default', { month: 'long' })
-})
-
-const currentYear = computed(() => {
-  return currentDate.value.getFullYear()
-})
-
-const currentMonth = computed(() => {
-  return currentDate.value.getMonth()
-})
-
-// Get contributions for current month only
-const currentMonthContributions = computed(() => {
-  const month = currentMonth.value + 1 // Months are 0-indexed in JS
-  const monthStr = month < 10 ? `0${month}` : month
-  
-  return yearlyContributions.value.filter(contrib => {
-    return contrib.date.startsWith(`${currentYear.value}-${monthStr}-`)
-  })
-})
-
-// Get calendar days for current month
-const calendarDays = computed(() => {
-  const year = currentYear.value
-  const month = currentMonth.value
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const firstDayOfMonth = new Date(year, month, 1).getDay()
-  
-  const days = []
-  
-  // Add empty cells for days before the first day of the month
-  for (let i = 0; i < firstDayOfMonth; i++) {
-    days.push({ isEmpty: true })
-  }
-  
-  // Add actual days of the month
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dayStr = day < 10 ? `0${day}` : day
-    const monthStr = (month + 1) < 10 ? `0${month + 1}` : month + 1
-    const date = `${year}-${monthStr}-${dayStr}`
-    const contribution = currentMonthContributions.value.find(c => c.date === date)
-    days.push({ 
-      date,
-      count: contribution?.count || 0,
-      isEmpty: false
-    })
-  }
-  
-  return days
-})
-
-// Fetch contributions data for current year
 async function fetchContributions() {
   loading.value = true
   error.value = null
   yearlyContributions.value = []
 
   try {
-    const response = await axios.get(
-      `https://github-contributions-api.jogruber.de/v4/${props.username}?y=${currentYear.value}`
+    const year = today.getFullYear()
+    const yearsToFetch = [year, year - 1]
+
+    const responses = await Promise.all(
+      yearsToFetch.map(y => axios.get(`https://github-contributions-api.jogruber.de/v4/${props.username}?y=${y}`))
     )
 
-    yearlyContributions.value = response.data.contributions || []
-    
+    responses.forEach(response => {
+      yearlyContributions.value.push(...(response.data.contributions || []))
+    })
   } catch (err) {
-    console.error('Error fetching GitHub contributions:', err)
-    error.value = 'Failed to load contribution data. Please check the username and try again.'
+    console.error('Error fetching contributions:', err)
+    error.value = 'Failed to load contribution data.'
   } finally {
     loading.value = false
   }
 }
 
+const weeks = computed(() => {
+  const start = new Date(today)
+  start.setDate(start.getDate() - (numberOfWeeks * 7))
+  
+  const days = []
+  for (let i = 0; i < numberOfWeeks * 7; i++) {
+    const dateStr = start.toISOString().split('T')[0]
+    const contribution = yearlyContributions.value.find(c => c.date === dateStr)
+
+    days.push({
+      date: dateStr,
+      count: contribution?.count || 0,
+    })
+
+    start.setDate(start.getDate() + 1)
+  }
+
+  const groupedWeeks = []
+  for (let i = 0; i < days.length; i += 7) {
+    groupedWeeks.push(days.slice(i, i + 7))
+  }
+
+  return groupedWeeks
+})
+
+const monthLabels = computed(() => {
+  const labels = []
+  let lastMonth = ''
+
+  weeks.value.forEach((week, ) => {
+    const firstDayOfWeek = new Date(week[0]?.date)
+    const month = firstDayOfWeek.toLocaleString('default', { month: 'short' })
+
+    if (month !== lastMonth) {
+      labels.push(month)
+      lastMonth = month
+    } else {
+      labels.push('')
+    }
+  })
+
+  return labels
+})
+
 function getContributionClass(day) {
-  if (day.isEmpty) return 'empty'
-  if (day.count === 0) return 'no-contributions'
+  if (!day || day.count === 0) return 'no-contributions'
   if (day.count <= 2) return 'low-contributions'
-  if (day.count <= 4) return 'medium-contributions'
+  if (day.count <= 5) return 'medium-contributions'
   return 'high-contributions'
 }
 
 function getTooltip(day) {
-  if (day.isEmpty) return ''
+  if (!day) return ''
   if (day.count === 0) return `No contributions on ${day.date}`
   return `${day.count} contribution${day.count !== 1 ? 's' : ''} on ${day.date}`
 }
@@ -140,64 +141,86 @@ watch(() => props.username, fetchContributions)
 </script>
 
 <style scoped>
-.github-contributions {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  max-width: 300px;
-  margin: 0 auto;
+.github-contributions-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 20px 0;
 }
 
-.loading, .error {
+.github-contributions {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.loading,
+.error {
   text-align: center;
   padding: 20px;
 }
 
 .error {
-  color: #d73a49;
+  color: red;
 }
 
-.calendar-container {
+.month-labels {
   display: flex;
-  gap: 10px;
+  margin-left: 45px; /* Align with the calendar grid */
 }
 
 .month-label {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-weight: bold;
-  padding-top: 20px;
-  font-size: 14px;
+  flex: 0 0 18px;
+  font-size: 12px;
+  color: #586069;
+  text-align: center;
+  margin-right: 3px; /* Match the gap between week columns */
 }
 
-.calendar-grid {
-  flex-grow: 1;
+.calendar {
+  display: flex;
+  margin-top: 8px;
 }
 
 .day-names {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  height: 145px; /* Adjusted to match weeks height */
 }
 
 .day-name {
   font-size: 11px;
   color: #586069;
-  text-align: center;
+  height: 18px;
+  line-height: 18px;
+  text-align: right;
+  padding-right: 8px;
+  margin-bottom: 3px; /* Match the gap between days */
 }
 
-.contribution-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+.weeks {
+  display: flex;
   gap: 3px;
 }
 
-.contribution-day {
-  aspect-ratio: 1;
-  border-radius: 2px;
+.week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.empty {
-  visibility: hidden;
+.day {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background-color: #ebedf0;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.day:hover {
+  cursor: pointer;
+  opacity: 0.8;
+  transform: scale(1.1);
 }
 
 .no-contributions {
@@ -205,18 +228,14 @@ watch(() => props.username, fetchContributions)
 }
 
 .low-contributions {
-  background-color: #9be9a8;
+  background-color: #c6e48b;
 }
 
 .medium-contributions {
-  background-color: #40c463;
+  background-color: #7bc96f;
 }
 
 .high-contributions {
-  background-color: #216e39;
-}
-
-.contribution-day:hover {
-  border: 1px solid rgba(0, 0, 0, 0.5);
+  background-color: #239a3b;
 }
 </style>
