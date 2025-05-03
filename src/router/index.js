@@ -11,6 +11,7 @@ import NewProjectView from "@/views/NewProjectView.vue";
 import NewObjectiveView from "@/views/NewObjectiveView.vue";
 import GithubCallback from '@/views/GithubCallback.vue'
 import Test from "@/views/TestEt.vue";
+import SearchView from "@/views/SearchView.vue";
 
 const routes = [
   {
@@ -72,6 +73,11 @@ const routes = [
     path: "/test",
     name: "test",
     component: Test,
+  },
+  {
+    path: "/search/:query",
+    name: "search",
+    component: SearchView,
   }
 ]
 

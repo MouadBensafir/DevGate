@@ -44,6 +44,7 @@ const useSignup = () => {
         lastname: lastname.value,
         email: email.value,
         bio: bio.value,
+        name: firstname.value + ' ' + lastname.value,
         birthday: birthday.value,
         createdAt: new Date(),
         githubUsername : '',
