@@ -157,6 +157,7 @@
             <i class="bi bi-box-arrow-right me-3"></i>
             <span>Logout</span>
           </button>
+          <SearchBar v-if="logged_in"></SearchBar>
         </template>
       </div>
       
@@ -177,6 +178,7 @@
 </template>
 
 <script setup>
+import SearchBar from "@/components/SearchBar.vue"
 import { inject, onMounted, ref, watch, onBeforeUnmount } from 'vue'
 import { signOut } from 'firebase/auth'
 import { auth, db } from '@/firebase'
