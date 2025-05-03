@@ -1,7 +1,7 @@
 <template>
   <div class="objectives-container d-flex flex-column px-md-5 px-3" style="min-height: 100vh; background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);">
     <div class="objectives-content py-4 flex-grow-1">
-      <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-3 pt-3">
         <h1 class="text-white mb-0 fw-bold"><i class="bi bi-target me-2"></i>My Objectives</h1>
         
         <router-link
