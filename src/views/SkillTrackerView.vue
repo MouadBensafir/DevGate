@@ -1,7 +1,18 @@
 <template>
   <div class="skills-container d-flex flex-column px-md-5 px-3" style="min-height: 100vh; background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);">
+    <!-- Loading State -->
+    <div v-if="isLoading" class="loading-state d-flex flex-column justify-content-center align-items-center py-5 flex-grow-1">
+      <div class="spinner-container mb-4">
+        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <h2 class="text-white mb-2">Loading your skills...</h2>
+      <p class="text-white-50 text-center">Please wait while we fetch your skills data</p>
+    </div>
+
     <!-- Skill list -->
-    <div v-if="skillList.length" class="skills-content py-5 flex-grow-1">
+    <div v-else-if="skillList.length" class="skills-content py-5 flex-grow-1">
       <h1 class="text-white mb-4 fw-bold"><i class="bi bi-stars me-2"></i>My Skills</h1>
       
       <div class="skill-board bg-white rounded-4 shadow p-4">
@@ -106,13 +117,18 @@ import { db } from '@/firebase'
 import SkillItem from '@/components/SkillItem.vue'
 
 const showCreateForm = ref(false)
+const isLoading = ref(false)
 const route = useRoute()
 const userId = route.params.userId
 
 const { newSkill, level, aquDate, addSkill } = useAddSkill()
 const { skillList, fetchSkills } = useFetchSkills(userId)
 
-onMounted(fetchSkills)
+onMounted(async () => {
+  isLoading.value = true
+  await fetchSkills()
+  isLoading.value = false
+})
 
 async function skillUpdate() {
   await addSkill(userId, newSkill.value, level.value, aquDate.value)
@@ -255,6 +271,28 @@ async function downgradeLevel(skillId) {
 .skill-form .input-group-text {
   background-color: #f8f9fa;
   color: #5b86e5;
+}
+
+/* Loading animation */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+}
+
+.spinner-border {
+  color: #36d1dc;
+  animation: spin 1.2s linear infinite, color-change 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes color-change {
+  0% { border-color: #36d1dc; border-right-color: transparent; }
+  50% { border-color: #5b86e5; border-right-color: transparent; }
+  100% { border-color: #36d1dc; border-right-color: transparent; }
 }
 
 /* Animation for form appearance */
