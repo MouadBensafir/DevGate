@@ -137,19 +137,19 @@
             <i class="bi bi-speedometer2 me-3"></i>
             <span>Dashboard</span>
           </router-link>
-          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/projects`" class="ocean-nav-item d-flex align-items-center mb-3 p-3">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/projects`" class="ocean-nav-item d-flex align-items-center mb-3 p-2">
             <i class="bi bi-folder me-3"></i>
             <span>My Projects</span>
           </router-link>
-          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/skill-tracker`" class="ocean-nav-item d-flex align-items-center mb-3 p-3">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/skill-tracker`" class="ocean-nav-item d-flex align-items-center mb-3 p-2">
             <i class="bi bi-stars me-3"></i>
             <span>Skills Tracker</span>
           </router-link>
-          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/objectives`" class="ocean-nav-item d-flex align-items-center mb-3 p-3">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/objectives`" class="ocean-nav-item d-flex align-items-center mb-3 p-2">
             <i class="bi bi-list-check me-3"></i>
             <span>Objectives</span>
           </router-link>
-          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/timeline`" class="ocean-nav-item d-flex align-items-center mb-3 p-3">
+          <router-link v-if="userInfo && userInfo.uid" :to="`/users/${userInfo?.uid}/timeline`" class="ocean-nav-item d-flex align-items-center mb-3 p-2">
             <i class="bi bi-activity me-3"></i>
             <span>Timeline</span>
           </router-link>
@@ -164,7 +164,7 @@
       <div class="flex-grow-1"></div>
       
       <!-- App version info -->
-      <div class="app-version text-center mb-1 small">
+      <div class="app-version text-center small">
         <span class="badge bg-light text-primary">DevGate</span>
       </div>
     </nav>
