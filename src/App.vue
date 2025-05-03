@@ -12,7 +12,7 @@
     <div class="flex-shrink-0" style="width: 250px">
       <NavBar />
     </div>
-    <div class="flex-grow-1 overflow-auto">
+    <div class="flex-grow-1 overflow-auto"> 
       <router-view />
     </div>
   </div>

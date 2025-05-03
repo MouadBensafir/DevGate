@@ -145,7 +145,7 @@ watch(() => props.username, fetchContributions)
   display: flex;
   justify-content: center;
   width: 100%;
-  padding: 20px 0;
+  padding: 10px 0; /* Reduced padding */
 }
 
 .github-contributions {
@@ -157,7 +157,7 @@ watch(() => props.username, fetchContributions)
 .loading,
 .error {
   text-align: center;
-  padding: 20px;
+  padding: 15px;
 }
 
 .error {
@@ -166,53 +166,53 @@ watch(() => props.username, fetchContributions)
 
 .month-labels {
   display: flex;
-  margin-left: 45px; /* Align with the calendar grid */
+  margin-left: 30px; /* Align with the calendar grid */
 }
 
 .month-label {
-  flex: 0 0 18px;
-  font-size: 12px;
+  flex: 0 0 12px; /* Reduced width */
+  font-size: 10px; /* Smaller text */
   color: #586069;
   text-align: center;
-  margin-right: 3px; /* Match the gap between week columns */
+  margin-right: 2px; /* Reduced gap */
 }
 
 .calendar {
   display: flex;
-  margin-top: 8px;
+  margin-top: 6px; /* Slightly tighter spacing */
 }
 
 .day-names {
   display: flex;
   flex-direction: column;
-  height: 145px; /* Adjusted to match weeks height */
+  height: 100px; /* Reduced height */
 }
 
 .day-name {
-  font-size: 11px;
+  font-size: 9px; /* Smaller font */
   color: #586069;
-  height: 18px;
-  line-height: 18px;
+  height: 12px;
+  line-height: 12px;
   text-align: right;
-  padding-right: 8px;
-  margin-bottom: 3px; /* Match the gap between days */
+  padding-right: 6px;
+  margin-bottom: 2px; /* Reduced spacing */
 }
 
 .weeks {
   display: flex;
-  gap: 3px;
+  gap: 2px; /* Reduced horizontal gap */
 }
 
 .week {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px; /* Reduced vertical gap */
 }
 
 .day {
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
   background-color: #ebedf0;
   transition: background-color 0.3s, transform 0.2s;
 }
@@ -220,7 +220,7 @@ watch(() => props.username, fetchContributions)
 .day:hover {
   cursor: pointer;
   opacity: 0.8;
-  transform: scale(1.1);
+  transform: scale(1.05); /* Slightly smaller hover effect */
 }
 
 .no-contributions {

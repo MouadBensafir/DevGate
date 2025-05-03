@@ -142,8 +142,8 @@ onBeforeUnmount(() => {
 .skill-chart-container {
   position: relative;
   width: 100%;
-  max-width: 500px;
-  height: 400px;
+  max-width: 400px;
+  height: 300px;
   margin: 0 auto;
   background-color: #ffffff;
   border-radius: 0.5rem;
