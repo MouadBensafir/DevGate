@@ -200,7 +200,7 @@ const renderChart = () => {
           reverse: true,
           title: {
             display: true,
-            text: 'Tasks'
+            text: 'Timeline'
           },
           ticks: {
             callback: function(value) {

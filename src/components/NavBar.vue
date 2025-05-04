@@ -3,11 +3,7 @@
     <!-- Version mobile (horizontale) -->
     <nav class="ocean-navbar-mobile d-md-none py-2 px-4">
       <div class="d-flex justify-content-between align-items-center">
-        <!-- Logo -->
-        <router-link to="/" class="ocean-logo">
-          <i class="bi bi-code me-2 fs-4"></i>
-          <span class="fw-bold fs-5">DevApp</span>
-        </router-link>
+        
         
         <!-- Toggle button -->
         <button @click="toggleMobileMenu" class="btn ocean-toggle-btn">
@@ -40,6 +36,11 @@
               {{ logged_in ? userInfo?.email : 'Not logged In' }}
             </small>
           </div>
+        </div>
+        
+        <!-- SearchBar for mobile (added here) -->
+        <div class="mb-3 px-3" v-if="logged_in">
+          <SearchBar class="w-100"></SearchBar>
         </div>
         
         <!-- Navigation Links -->
@@ -92,7 +93,8 @@
     </nav>
     
     <!-- Version Desktop (verticale) -->
-    <nav class="ocean-sidebar d-none d-md-flex flex-column vh-100 p-3">
+    <nav class="ocean-sidebar d-none d-md-flex flex-column vh-100 p-3">    
+      <!-- SearchBar - Moved here for better visibility -->
       <!-- User Info -->
       <div class="ocean-user-info d-flex align-items-center mb-4 p-3">
         <div class="ocean-avatar me-3 position-relative">
@@ -119,7 +121,9 @@
           </small>
         </div>
       </div>
-      
+      <div class="mb-4 px-2" v-if="logged_in">
+        <SearchBar class="w-100"></SearchBar>
+      </div>
       <!-- Navigation Links -->
       <div class="ocean-nav-links mb-4">
         <template v-if="!logged_in">
@@ -157,7 +161,7 @@
             <i class="bi bi-box-arrow-right me-3"></i>
             <span>Logout</span>
           </button>
-          <SearchBar v-if="logged_in"></SearchBar>
+          
         </template>
       </div>
       

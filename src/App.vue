@@ -61,6 +61,8 @@ watch(user, async (newUser) => {
   height: calc(100vh - 56px); /* Adjust based on your mobile navbar height */
 }
 
+
+
 @media (min-width: 768px) {
   .overflow-auto {
     height: 100vh;

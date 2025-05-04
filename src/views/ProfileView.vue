@@ -120,8 +120,8 @@
                 placeholder="Tell us about yourself..."
               ></textarea>
               <button
-                  class="btn btn-save mt-3"
-                  @click="saveChanges"
+                class="btn btn-save mt-3"
+                @click="saveChanges"
               >
                 <i class="bi bi-save me-2"></i>Save Changes
               </button>
@@ -129,6 +129,11 @@
             <p v-else class="profile-bio-text">
               {{ user?.bio || "No bio provided" }}
             </p>
+
+            <!-- Send Message Button -->
+            <div v-if="connectedUser?.uid !== user.id" class="mt-3">
+              <button class="btn btn-secondary" @click="sendMessage">Send Message</button>
+            </div>
           </div>
         </div>
       </div>
@@ -177,15 +182,23 @@
 </template>
 
 <script setup>
-import {ref, inject, onMounted} from "vue";
-import {useRoute} from "vue-router";
-import {doc, getDoc, getDocs, collection, updateDoc} from "firebase/firestore";
-import {db} from "@/firebase";
+import {ref, onMounted} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import {doc, getDoc, getDocs, collection, updateDoc, setDoc} from "firebase/firestore";
+import {auth, db} from "@/firebase";
 import ProjectItem from "@/components/ProjectItem.vue";
 import SkillItem from "@/components/SkillItem.vue";
+import getUser from "@/composables/getUser";
+import { onAuthStateChanged } from "firebase/auth";
 
-const connectedUser = inject("userDoc");
+const connectedUser = getUser().user;
+
+onAuthStateChanged(auth, (user) => {
+  connectedUser.value = user;
+  console.log("updated");
+})
 const route = useRoute();
+const router = useRouter();
 const user = ref({
   firstname: "",
   lastname: "",
@@ -284,7 +297,31 @@ async function saveChanges() {
     console.error("Error updating profile:", error);
   }
 }
+
+// Send message logic (extracted from your original)
+async function sendMessage() {
+  console.log(connectedUser.value.uid);
+  if (!connectedUser.value?.uid || !user.value.id) return;
+  const currentUid = connectedUser.value.uid;
+  const targetUid = user.value.id;
+
+  const groupID = currentUid > targetUid ? currentUid + targetUid : targetUid + currentUid;
+  const group = {
+    groupMembers: [currentUid, targetUid],
+    date: new Date(),
+    groupID,
+  };
+
+  const groupRef = doc(db, "groups", groupID);
+  const groupSnap = await getDoc(groupRef);
+  if (!groupSnap.exists()) {
+    await setDoc(groupRef, group);
+  }
+
+  router.push("/discussion/" + groupID);
+}
 </script>
+
 
 <style scoped>
 .profile-container {

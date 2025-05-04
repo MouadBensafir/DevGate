@@ -33,7 +33,7 @@
         <div v-if="displayMode" class="project-board bg-white rounded-4 shadow">
           <div class="list-group list-group-flush">
             <div v-for="project in projects" :key="project.id" class="list-item">
-              <ProjectItem @projectDeleted="fetchProjects" :userId="userId" :projectId="project.id"/>
+                <ProjectItem @projectDeleted="fetchProjects" :userId="userId" :projectId="project.id"/>
             </div>
           </div>
         </div>
@@ -41,7 +41,9 @@
         <!-- Gallery Mode -->
         <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           <div v-for="project in projects" :key="project.id" class="col">
-            <ProjectCard @projectDeleted="fetchProjects" :userId="userId" :projectId="project.id"/>
+            <div class="projectContainerCard">
+              <ProjectCard @projectDeleted="fetchProjects" :userId="userId" :projectId="project.id"/>
+            </div>
           </div>
         </div>
       </div>
