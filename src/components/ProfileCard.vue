@@ -56,8 +56,8 @@ async function sendMessage() {
       <p class="card-text">{{ user.bio }}</p>
       <small class="text-muted">Joined: {{ formatDate(user?.createdAt) }}</small>
     </div>
-    <div class="card-footer">
-      <button class="btn btn-primary" @click.stop="goToProfile">View Profile</button>
+    <div class="card-footer d-flex justify-content-between">
+      <button class="btn btn-primary me-3" @click.stop="goToProfile">View Profile</button>
       <button v-if="connectedUser.uid !== user.id" class="btn btn-secondary" @click.stop="sendMessage">Send Message</button>
     </div>
   </div>
