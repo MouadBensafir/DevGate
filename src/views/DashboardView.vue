@@ -53,15 +53,82 @@
           <h1 class="mb-0 text-white fw-bold">
             <i class="bi bi-speedometer2 me-2"></i>Development Dashboard
           </h1>
-          <button
-            v-if="!userInfo.githubUsername"
-            @click="linkGitHubAccount"
-            :disabled="isLoading"
-            class="github-button"
-          >
-            <i class="bi bi-github me-2"></i>
-            {{ isLoading ? "Connecting..." : "Link GitHub Account" }}
-          </button>
+          <div>
+            <button
+              @click="showModal = true"
+              class="btn btn-outline-light px-4 py-2 me-2"
+            >
+              <i class="bi bi-clock-history me-2"></i>Log Coding Hours
+            </button>
+            <button
+              v-if="!userInfo.githubUsername"
+              @click="linkGitHubAccount"
+              :disabled="isLoading"
+              class="github-button"
+            >
+              <i class="bi bi-github me-2"></i>
+              {{ isLoading ? "Connecting..." : "Link GitHub Account" }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal for Logging Coding Hours -->
+        <div v-if="showModal" class="modal-overlay">
+          <div class="modal-content">
+            <h2 class="modal-title">Log Coding Hours</h2>
+            <form @submit.prevent="submitCodedHours">
+              <div class="form-group">
+                <label for="date">Date</label>
+                <input
+                  type="date"
+                  id="date"
+                  v-model="form.date"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="hours">Hours Coded</label>
+                <div class="d-flex">
+                  <input
+                    type="number"
+                    id="hours"
+                    v-model="form.hours"
+                    class="form-control me-2"
+                    min="0"
+                    step="1"
+                    placeholder="Hours"
+                    required
+                  />
+                  <input
+                    type="number"
+                    id="minutes"
+                    v-model="form.minutes"
+                    class="form-control"
+                    min="0"
+                    max="59"
+                    step="1"
+                    placeholder="Minutes"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  @click="showModal = false"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div v-if="successMessage" class="success-message">
+          <p>{{ successMessage }}</p>
         </div>
 
         <!-- Main Content Area -->
@@ -86,7 +153,7 @@
 
                   <div class="projects-grid">
                     <div
-                      v-for="project in projectsData"
+                      v-for="project in projectsData.filter(project => !project.completed)"
                       :key="project.id"
                       class="project-item"
                     >
@@ -317,8 +384,8 @@
 
 
 <script setup>
-import { ref, onMounted, watch, inject } from "vue";
-import { collection, getDocs } from "firebase/firestore";
+import { ref, onMounted, watch, inject, reactive } from "vue";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import SkillLevelChart from "@/components/PieChartSkill.vue";
 import GanttChart from "@/components/GanttChart.vue";
@@ -337,6 +404,50 @@ const loading = ref(true);
 const { user } = getUser();
 const userInfo = inject("userDoc");
 const loggedIn = inject("logged_in");
+
+const showModal = ref(false);
+const form = reactive({ date: "", hours: "", minutes: "" });
+const successMessage = ref("");
+
+const submitCodedHours = async () => {
+  const today = new Date().toISOString().split("T")[0];
+  if (
+    !form.date ||
+    (!form.hours && !form.minutes) ||
+    isNaN(form.hours) ||
+    isNaN(form.minutes) ||
+    form.date >= today ||
+    form.minutes < 0 ||
+    form.minutes >= 60
+  ) {
+    successMessage.value = "Invalid input. Please ensure the date is in the past and minutes are valid.";
+    setTimeout(() => (successMessage.value = ""), 3000);
+    return;
+  }
+
+  const totalHours = parseFloat(form.hours) + parseFloat(form.minutes) / 60;
+
+  try {
+    await addDoc(
+      collection(db, "users", user.value.uid, "codedhours"),
+      {
+        date: form.date,
+        hours: totalHours,
+        timestamp: new Date(),
+      }
+    );
+    successMessage.value = "Coding hours logged successfully!";
+    setTimeout(() => (successMessage.value = ""), 3000);
+    showModal.value = false;
+    form.date = "";
+    form.hours = "";
+    form.minutes = "";
+  } catch (error) {
+    console.error("Error logging coding hours:", error);
+    successMessage.value = "Failed to log coding hours. Please try again.";
+    setTimeout(() => (successMessage.value = ""), 3000);
+  }
+};
 
 // Fetch skills
 const fetchSkills = async () => {
@@ -405,6 +516,8 @@ watch(
 onMounted(() => {
   if (user.value) fetchData();
 });
+
+
 </script>
 
 <style scoped>
@@ -724,6 +837,132 @@ onMounted(() => {
 
   .chart-content {
     min-height: 250px;
+  }
+}
+
+/* Modal styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #5b86e5;
+  color: #fff;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background: #36d1dc;
+}
+
+.btn-secondary {
+  background: #ccc;
+  color: #333;
+  transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #bbb;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Success message styling */
+.success-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2a9cbf; /* Darker shade of blue */
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Slightly darker shadow */
+  animation: fadeInOut 3s ease-in-out;
+  z-index: 1001;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10%,
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 }
 </style>
