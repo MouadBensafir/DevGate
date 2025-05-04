@@ -29,13 +29,17 @@
 </template>
 
 <script setup>
-import { ref, nextTick, defineProps } from "vue";
+import { ref, nextTick, defineProps, onMounted } from "vue";
 import { db } from "@/firebase";
 import {
   collection,
   query,
   orderBy,
   onSnapshot,
+  updateDoc,
+  doc,
+    getDocs,
+    getDoc
 } from "firebase/firestore";
 import MessageItem from "@/components/MessageItem.vue";
 import ChatLegendPrivate from "@/components/ChatLegendPrivate.vue";
@@ -64,6 +68,27 @@ onSnapshot(
     window.scrollTo(0, document.body.scrollHeight);
   }
 );
+
+onMounted(async () => {
+  // Update all the messages to confirm read
+  const groupDoc = doc(db, "groups", props.groupID);
+  const groupData = await getDoc(groupDoc);
+  const groupMembers = groupData.data().groupMembers || [];
+  const groupAdmins = groupData.data().groupAdmins || [];
+  const allMembers = [...groupMembers, ...groupAdmins];
+  const messagesRef = collection(db, "groups", props.groupID, "messages");
+  const messagesSnapshot = await getDocs(messagesRef);
+  messagesSnapshot.forEach(async (messageDoc) => {
+    const messageData = messageDoc.data();
+    const readby = messageData.readby || {};
+    allMembers.forEach((member) => {
+      if (!readby[member]) {
+        readby[member] = false;
+      }
+    });
+    await updateDoc(messageDoc.ref, { readby });
+  });
+});
 
 </script>
 

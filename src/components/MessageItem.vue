@@ -1,7 +1,7 @@
 <template>
   <div class="message-container">
     <div
-      v-if="message.authorID === userID"
+      v-if="message && message.authorID === userID"
       class="message message-sent"
     >
       <!-- Options Toggle -->

@@ -31,6 +31,11 @@ async function sendMessage() {
     groupMembers: [connectedUser.value.uid, props.user.id],
     date: new Date(),
   }
+  if (connectedUser.value.uid > props.user.id) {
+    group.groupID = connectedUser.value.uid + props.user.id;
+  } else {
+    group.groupID = props.user.id + connectedUser.value.uid;
+  }
   await setDoc(doc(db, "groups", connectedUser.value.uid + props.user.id), group);
   router.push("/discussion/" + connectedUser.value.uid + props.user.id);
 }
