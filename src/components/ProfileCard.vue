@@ -36,7 +36,7 @@ async function sendMessage() {
   } else {
     group.groupID = props.user.id + connectedUser.value.uid;
   }
-  await setDoc(doc(db, "groups", connectedUser.value.uid + props.user.id), group);
+  await setDoc(doc(db, "groups", group.groupID), group);
   router.push("/discussion/" + connectedUser.value.uid + props.user.id);
 }
 

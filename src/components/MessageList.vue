@@ -70,24 +70,35 @@ onSnapshot(
 );
 
 onMounted(async () => {
-  // Update all the messages to confirm read
-  const groupDoc = doc(db, "groups", props.groupID);
-  const groupData = await getDoc(groupDoc);
-  const groupMembers = groupData.data().groupMembers || [];
-  const groupAdmins = groupData.data().groupAdmins || [];
-  const allMembers = [...groupMembers, ...groupAdmins];
-  const messagesRef = collection(db, "groups", props.groupID, "messages");
-  const messagesSnapshot = await getDocs(messagesRef);
-  messagesSnapshot.forEach(async (messageDoc) => {
-    const messageData = messageDoc.data();
-    const readby = messageData.readby || {};
-    allMembers.forEach((member) => {
-      if (!readby[member]) {
-        readby[member] = false;
-      }
-    });
-    await updateDoc(messageDoc.ref, { readby });
-  });
+  try {
+    // Update all the messages to confirm read
+    const groupDoc = doc(db, "groups", props.groupID);
+    const groupData = await getDoc(groupDoc);
+
+    if (!groupData.exists()) {
+      console.error("Group does not exist.");
+      return;
+    }
+    const allMembers = groupData.data().groupMembers || [];
+
+    const messagesRef = collection(db, "groups", props.groupID, "messages");
+    const messagesSnapshot = await getDocs(messagesRef);
+
+    for (const messageDoc of messagesSnapshot.docs) {
+      const messageData = messageDoc.data();
+      const readby = messageData.readby || {};
+
+      allMembers.forEach((member) => {
+        if (!readby[member]) {
+          readby[member] = true;
+        }
+      });
+
+      await updateDoc(doc(db, "groups", props.groupID, "messages", messageDoc.id), { readby });
+    }
+  } catch (error) {
+    console.error("Error updating messages:", error);
+  }
 });
 
 </script>
