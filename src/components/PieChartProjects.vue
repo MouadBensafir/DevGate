@@ -52,7 +52,7 @@ const initChart = () => {
     type: 'pie',
     data: chartData.value,
     options: {
-      responsive: true,
+      responsive: false,
       maintainAspectRatio: false,
       plugins: {
         legend: {
@@ -138,10 +138,11 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .chart-container {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px; /* Fixed width */
+  height: 300px; /* Fixed height */
   margin: 0 auto;
   background-color: #ffffff;
   border-radius: 8px;

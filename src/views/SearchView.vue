@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { getDocs, collection } from "firebase/firestore";
 import { db } from '../firebase';
@@ -21,6 +21,11 @@ async function fetchUsers() {
 }
 
 onMounted(() => {
+  fetchUsers();
+});
+
+watch(() => route.params.query, (newQuery) => {
+  searchQuery.value = newQuery || '';
   fetchUsers();
 });
 </script>

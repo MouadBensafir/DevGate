@@ -87,17 +87,32 @@
                   required
                 />
               </div>
-              <div class="form-group">
-                <label for="hours">Hours Coded</label>
-                <input
-                  type="number"
-                  id="hours"
-                  v-model="form.hours"
-                  class="form-control"
-                  min="0"
-                  step="0.1"
-                  required
-                />
+              <div class="form-group d-flex gap-3">
+                <div class="flex-grow-1">
+                  <label for="hours">Hours</label>
+                  <input
+                    type="number"
+                    id="hours"
+                    v-model="form.hours"
+                    class="form-control"
+                    min="0"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div class="flex-grow-1">
+                  <label for="minutes">Minutes</label>
+                  <input
+                    type="number"
+                    id="minutes"
+                    v-model="form.minutes"
+                    class="form-control"
+                    min="0"
+                    max="59"
+                    step="1"
+                    required
+                  />
+                </div>
               </div>
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -124,7 +139,7 @@
             <div class="row g-4">
               <!-- Projects Section - Left -->
               <div class="col-lg-8">
-                <div class="section-container projects-section">
+                <div class="section-container projects-section h-100">
                   <div class="section-header">
                     <h2 class="text-white">
                       <i class="bi bi-kanban me-2"></i>Current Projects
@@ -289,7 +304,7 @@
           <div class="charts-section">
             <div class="row g-4">
               <!-- Row 1 -->
-              <div class="col-md-6">
+              <div class="col-md-6" v-if="projectsData.length > 0">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -301,7 +316,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6" v-if="skillsData.length > 0">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -315,7 +330,7 @@
               </div>
 
               <!-- Row 2 -->
-              <div class="col-md-6">
+              <div class="col-md-6" v-if="objectivesData.length > 0">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -343,14 +358,14 @@
           </div>
 
           <!-- Objectives Timeline -->
-          <div class="col-12">
+          <div class="col-12" v-if="objectivesData.length > 0">
             <div class="section-container chart-container">
               <div class="section-header">
                 <h2 class="text-white">
                   <i class="bi bi-calendar3 me-2"></i>Objectives Timeline
                 </h2>
               </div>
-              <div class="chart-content">
+              <div class="chart-content" >
                 <GanttChart :tasks="objectivesData" />
               </div>
             </div>
@@ -401,31 +416,37 @@ const userInfo = inject("userDoc");
 const loggedIn = inject("logged_in");
 
 const showModal = ref(false);
-const form = reactive({ date: "", hours: "" });
+const form = reactive({ date: "", hours: "", minutes: "" });
 const successMessage = ref("");
 
 const submitCodedHours = async () => {
   const today = new Date().toISOString().split("T")[0];
-  if (!form.date || !form.hours || isNaN(form.hours) || form.date >= today) {
-    successMessage.value = "Invalid input. Please ensure the date is in the past.";
+  if (
+    !form.date ||
+    (!form.hours && !form.minutes) ||
+    isNaN(form.hours) ||
+    isNaN(form.minutes) ||
+    form.date >= today
+  ) {
+    successMessage.value =
+      "Invalid input. Please ensure the date is in the past and values are valid.";
     setTimeout(() => (successMessage.value = ""), 3000);
     return;
   }
 
   try {
-    await addDoc(
-      collection(db, "users", user.value.uid, "codedhours"),
-      {
-        date: form.date,
-        hours: parseFloat(form.hours),
-        timestamp: new Date(),
-      }
-    );
+    const totalHours = parseFloat(form.hours) + parseFloat(form.minutes) / 60;
+    await addDoc(collection(db, "users", user.value.uid, "codedhours"), {
+      date: form.date,
+      hours: totalHours,
+      timestamp: new Date(),
+    });
     successMessage.value = "Coding hours logged successfully!";
     setTimeout(() => (successMessage.value = ""), 3000);
     showModal.value = false;
     form.date = "";
     form.hours = "";
+    form.minutes = "";
   } catch (error) {
     console.error("Error logging coding hours:", error);
     successMessage.value = "Failed to log coding hours. Please try again.";
