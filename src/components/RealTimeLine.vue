@@ -1,7 +1,5 @@
 <template>
   <div class="timeline-container">
-    <h2 class="timeline-title">Activity Timeline</h2>
-    
     <!-- Filter Buttons -->
     <div class="filter-buttons">
       <button 
