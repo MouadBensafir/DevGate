@@ -2,7 +2,7 @@
 import {defineProps, ref} from 'vue';
 import { useRouter } from 'vue-router';
 import {getAuth} from "firebase/auth";
-import {setDoc, doc} from "firebase/firestore";
+import {setDoc, doc, getDoc} from "firebase/firestore";
 import {db} from "@/firebase";
 
 const props = defineProps({
@@ -36,7 +36,12 @@ async function sendMessage() {
   } else {
     group.groupID = props.user.id + connectedUser.value.uid;
   }
-  await setDoc(doc(db, "groups", group.groupID), group);
+  // we set a new group if it doesn't exist
+  const groupRef = doc(db, "groups", group.groupID);
+  const groupSnap = await getDoc(groupRef);
+  if (!groupSnap.exists()) {
+    await setDoc(groupRef, group);
+  }
   router.push("/discussion/" + connectedUser.value.uid + props.user.id);
 }
 
