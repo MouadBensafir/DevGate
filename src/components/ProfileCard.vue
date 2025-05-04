@@ -42,7 +42,7 @@ async function sendMessage() {
   if (!groupSnap.exists()) {
     await setDoc(groupRef, group);
   }
-  router.push("/discussion/" + connectedUser.value.uid + props.user.id);
+  router.push("/discussion/" + group.groupID);
 }
 
 </script>
