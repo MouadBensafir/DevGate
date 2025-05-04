@@ -103,6 +103,7 @@ async function onSubmit(){
       });
   }
   else{
+    project.value.completed = false;
     await addDoc(collection(db, 'users', props.userId, 'projects'), project.value)
     .then(() => {
       console.log('Project added successfully');

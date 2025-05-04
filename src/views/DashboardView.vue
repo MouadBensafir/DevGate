@@ -1,10 +1,24 @@
 <template>
-  <div class="dashboard-container d-flex flex-column px-md-5 px-3" style="min-height: 100vh; background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);">
+  <div
+    class="dashboard-container d-flex flex-column px-md-5 px-3"
+    style="
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);
+    "
+  >
     <!-- Login State -->
-    <div v-if="!loggedIn" class="text-center d-flex flex-column align-items-center justify-content-center flex-grow-1 py-5">
-      <i class="bi bi-box-arrow-in-right" style="font-size: 4rem; color: #5b86e5;"></i>
+    <div
+      v-if="!loggedIn"
+      class="text-center d-flex flex-column align-items-center justify-content-center flex-grow-1 py-5"
+    >
+      <i
+        class="bi bi-box-arrow-in-right"
+        style="font-size: 4rem; color: #5b86e5"
+      ></i>
       <h2 class="mt-3 text-white fw-bold">Welcome to Your Dashboard</h2>
-      <p class="text-white-50 mb-4">Sign in to unlock personalized insights and track your progress.</p>
+      <p class="text-white-50 mb-4">
+        Sign in to unlock personalized insights and track your progress.
+      </p>
       <router-link to="/login" class="btn btn-outline-light px-4 py-2">
         <i class="bi bi-person-circle me-2"></i>Log In
       </router-link>
@@ -17,17 +31,25 @@
         class="loading-state d-flex flex-column justify-content-center align-items-center py-5 flex-grow-1"
       >
         <div class="spinner-container mb-4">
-          <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+          <div
+            class="spinner-border text-light"
+            role="status"
+            style="width: 3rem; height: 3rem"
+          >
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
         <h2 class="text-white mb-2">Loading your dashboard...</h2>
-        <p class="text-white-50 text-center">Please wait while we prepare your insights</p>
+        <p class="text-white-50 text-center">
+          Please wait while we prepare your insights
+        </p>
       </div>
 
       <!-- Dashboard Content -->
       <div v-else class="dashboard-content py-4 flex-grow-1">
-        <div class="d-flex justify-content-between align-items-center pt-4 mb-4">
+        <div
+          class="d-flex justify-content-between align-items-center pt-4 mb-4"
+        >
           <h1 class="mb-0 text-white fw-bold">
             <i class="bi bi-speedometer2 me-2"></i>Development Dashboard
           </h1>
@@ -38,7 +60,7 @@
             class="github-button"
           >
             <i class="bi bi-github me-2"></i>
-            {{ isLoading ? 'Connecting...' : 'Link GitHub Account' }}
+            {{ isLoading ? "Connecting..." : "Link GitHub Account" }}
           </button>
         </div>
 
@@ -54,24 +76,43 @@
                     <h2 class="text-white">
                       <i class="bi bi-kanban me-2"></i>Current Projects
                     </h2>
-                    <router-link :to="`users/${userInfo?.uid}/projects`" class="view-more">
+                    <router-link
+                      :to="`users/${userInfo?.uid}/projects`"
+                      class="view-more"
+                    >
                       View All<i class="bi bi-arrow-right ms-2"></i>
                     </router-link>
                   </div>
-                  
+
                   <div class="projects-grid">
-                    <div v-for="project in projectsData" :key="project.id" class="project-item">
+                    <div
+                      v-for="project in projectsData"
+                      :key="project.id"
+                      class="project-item"
+                    >
                       <div class="project-image">
-                        <img :src="project.image" alt="project-image" class="img-fluid">
+                        <img
+                          :src="project.image"
+                          alt="project-image"
+                          class="img-fluid"
+                        />
                       </div>
                       <div class="project-details">
                         <h3>{{ project.name }}</h3>
-                        <p class="project-description">{{ project.description }}</p>
+                        <p class="project-description">
+                          {{ project.description }}
+                        </p>
                         <div class="project-meta">
                           <span class="project-date">
-                            <i class="bi bi-calendar3 me-1"></i>{{ project.date.toDate().toLocaleDateString() }}
+                            <i class="bi bi-calendar3 me-1"></i
+                            >{{ project.date.toDate().toLocaleDateString() }}
                           </span>
-                          <a :href="project.github" class="github-link" target="_blank">
+                          <a
+                            v-if="project.github"
+                            :href="project.github"
+                            class="github-link"
+                            target="_blank"
+                          >
                             <i class="bi bi-github me-1"></i>View on GitHub
                           </a>
                         </div>
@@ -80,11 +121,11 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- Right Side - Skills and Objectives -->
               <div class="col-lg-4">
                 <!-- Skills Section -->
-                 <!-- GitHub Timeline -->
+                <!-- GitHub Timeline -->
                 <div class="section-container github-timeline-section mb-4">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -98,30 +139,73 @@
                     </div>
                   </div>
                 </div>
+                <!-- Skills Section -->
                 <div class="section-container skills-section mb-4">
                   <div class="section-header">
                     <h2 class="text-white">
                       <i class="bi bi-lightning-charge me-2"></i>Skill Levels
                     </h2>
-                    <router-link :to="`users/${userInfo?.uid}/skill-tracker`" class="view-more">
+                    <router-link
+                      :to="`users/${userInfo?.uid}/skill-tracker`"
+                      class="view-more"
+                    >
                       View All<i class="bi bi-arrow-right ms-2"></i>
                     </router-link>
                   </div>
-                  
-                  <div class="skills-list">
-                    <div v-for="skill in skillsData" :key="skill.name" class="skill-item">
-                      <div class="skill-info">
-                        <span class="skill-name">{{ skill.name }}</span>
-                        <span class="skill-level">Level {{ skill.level }}</span>
+
+                  <div class="skills-list p-3">
+                    <div class="skill-items-container">
+                      <div v-if="skillsData.length > 0">
+                        <div
+                          v-for="skill in skillsData"
+                          :key="skill.name"
+                          class="skill-item"
+                          :class="{
+                            'skill-beginner': skill.level === 'beginner',
+                            'skill-intermediate': skill.level === 'intermediate',
+                            'skill-advanced': skill.level === 'advanced',
+                            'skill-expert': skill.level === 'expert',
+                          }"
+                        >
+                          <div class="skill-info">
+                            <span class="skill-name">{{ skill.name }}</span>
+                            <span class="skill-level text-capitalize">{{
+                              skill.level
+                            }}</span>
+                          </div>
+                          <div class="progress" style="height: 10px">
+                            <div
+                              class="progress-bar"
+                              :class="{
+                                'bg-info': skill.level === 'beginner',
+                                'bg-primary': skill.level === 'intermediate',
+                                'bg-success': skill.level === 'advanced',
+                                'bg-danger': skill.level === 'expert',
+                              }"
+                              :style="{
+                                width:
+                                  skill.level === 'beginner'
+                                    ? '25%'
+                                    : skill.level === 'intermediate'
+                                    ? '50%'
+                                    : skill.level === 'advanced'
+                                    ? '75%'
+                                    : '100%',
+                              }"
+                              role="progressbar"
+                            ></div>
+                          </div>
+                        </div>
                       </div>
-                      <div class="skill-progress">
-                        <div class="skill-progress-bar" :style="`width: ${(skill.level / 10) * 100}%`"></div>
+                      <div v-else>
+                        <span>Add A new Skill</span>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Objectives Section -->
+                 <!-- Objectives Section -->
                 <div class="section-container objectives-section">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -146,25 +230,23 @@
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
-          
 
           <!-- Charts Section -->
           <div class="charts-section">
             <div class="row g-4">
-              <!-- Skills Bubble Chart -->
+              <!-- Skills PieChart  -->
               <div class="col-md-6 col-lg-4">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
-                      <i class="bi bi-grid-3x3-gap me-2"></i>Skills Bubble Map
+                      <i class="bi bi-check2-circle me-2"></i>Projects Status
                     </h2>
                   </div>
                   <div class="chart-content">
-                    <BubbleChart :skills="skillsData" />
+                    <PieChartProjects :projects="projectsData" />
                   </div>
                 </div>
               </div>
@@ -174,7 +256,8 @@
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
-                      <i class="bi bi-pie-chart-fill me-2"></i>Skills Distribution
+                      <i class="bi bi-pie-chart-fill me-2"></i>Skills
+                      Distribution
                     </h2>
                   </div>
                   <div class="chart-content">
@@ -241,44 +324,60 @@ import SkillLevelChart from "@/components/PieChartSkill.vue";
 import GanttChart from "@/components/GanttChart.vue";
 import getUser from "@/composables/getUser";
 import PieChartObjectives from "@/components/PieChartOjectives.vue";
-import BubbleChart from "@/components/BubbleChart.vue";
+import PieChartProjects from "@/components/PieChartProjects.vue";
 import RealTimeLine from "@/components/RealTimeLine.vue";
-import useLinkGitHub from '@/composables/useLinkGitHub';
+import useLinkGitHub from "@/composables/useLinkGitHub";
 import TimeLine from "@/components/TimeLine.vue";
 
-const { linkGitHubAccount, error, isLoading } = useLinkGitHub()
+const { linkGitHubAccount, error, isLoading } = useLinkGitHub();
 const skillsData = ref([]);
 const objectivesData = ref([]);
 const projectsData = ref([]);
 const loading = ref(true);
 const { user } = getUser();
-const userInfo = inject('userDoc');
-const loggedIn = inject('logged_in');
+const userInfo = inject("userDoc");
+const loggedIn = inject("logged_in");
 
 // Fetch skills
 const fetchSkills = async () => {
-  const querySnapshot = await getDocs(collection(db, "users", user.value.uid, "skills"));
-  skillsData.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const querySnapshot = await getDocs(
+    collection(db, "users", user.value.uid, "skills")
+  );
+  skillsData.value = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 };
 
 // Fetch objectives
 const fetchObjectives = async () => {
-  const querySnapshot = await getDocs(collection(db, "users", user.value.uid, "objectives"));
-  objectivesData.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const querySnapshot = await getDocs(
+    collection(db, "users", user.value.uid, "objectives")
+  );
+  objectivesData.value = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 };
 
 // Fetch Projects
 const fetchProjects = async () => {
   loading.value = true;
   try {
-    const querySnapshot = await getDocs(collection(db, "users", user.value.uid, "projects"));
-    projectsData.value = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+    const querySnapshot = await getDocs(
+      collection(db, "users", user.value.uid, "projects")
+    );
+    projectsData.value = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log("Projects fetched: ", projectsData.value);
   } catch (error) {
     console.error("Error fetching projects: ", error);
   } finally {
     loading.value = false;
   }
-}
+};
 
 // Fetch both
 const fetchData = async () => {
@@ -286,6 +385,7 @@ const fetchData = async () => {
     if (!user.value?.uid) return;
     loading.value = true;
     await Promise.all([fetchSkills(), fetchObjectives(), fetchProjects()]);
+    console.log(skillsData.value.length > 0)
   } catch (error) {
     console.error("Error fetching data:", error);
   } finally {
@@ -294,9 +394,13 @@ const fetchData = async () => {
 };
 
 // Watch user and fetch data
-watch(user, (newUser) => {
-  if (newUser) fetchData();
-}, { immediate: true });
+watch(
+  user,
+  (newUser) => {
+    if (newUser) fetchData();
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   if (user.value) fetchData();
@@ -417,7 +521,7 @@ onMounted(() => {
 
 .project-description {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);  /* More visible text */
+  color: rgba(255, 255, 255, 0.9); /* More visible text */
   margin-bottom: 12px;
   overflow: hidden;
 }
@@ -430,7 +534,7 @@ onMounted(() => {
 }
 
 .project-date {
-  color: rgba(255, 255, 255, 0.8);  /* More visible date */
+  color: rgba(255, 255, 255, 0.8); /* More visible date */
 }
 
 .github-link {
@@ -470,7 +574,7 @@ onMounted(() => {
 
 .skill-progress {
   height: 6px;
-  background: rgba(255, 255, 255, 0.2);  /* Lighter progress background */
+  background: rgba(255, 255, 255, 0.2); /* Lighter progress background */
   border-radius: 3px;
 }
 
@@ -546,7 +650,7 @@ onMounted(() => {
 
 /* GitHub button */
 .github-button {
-  background-color: rgba(60, 70, 80, 0.8);  /* Lighter button */
+  background-color: rgba(60, 70, 80, 0.8); /* Lighter button */
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -579,14 +683,27 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes color-change {
-  0% { border-color: #36d1dc; border-right-color: transparent; }
-  50% { border-color: #5b86e5; border-right-color: transparent; }
-  100% { border-color: #36d1dc; border-right-color: transparent; }
+  0% {
+    border-color: #36d1dc;
+    border-right-color: transparent;
+  }
+  50% {
+    border-color: #5b86e5;
+    border-right-color: transparent;
+  }
+  100% {
+    border-color: #36d1dc;
+    border-right-color: transparent;
+  }
 }
 
 /* Mobile responsiveness */
@@ -594,7 +711,7 @@ onMounted(() => {
   .projects-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .section-container {
     margin-bottom: 20px;
   }
@@ -604,7 +721,7 @@ onMounted(() => {
   .section-header h2 {
     font-size: 1.1rem;
   }
-  
+
   .chart-content {
     min-height: 250px;
   }

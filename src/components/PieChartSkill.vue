@@ -98,6 +98,19 @@ const initChart = () => {
                 return `${label}: ${value} skill${value !== 1 ? 's' : ''} (${percentage}%)`;
               }
             }
+          },
+          title: {
+            display: true,
+            text: 'Skills mastery distribution',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+            },
+            padding: {
+              top: 10,
+              bottom: 20
+            }
           }
         },
         animation: {
