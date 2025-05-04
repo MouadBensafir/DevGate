@@ -83,7 +83,7 @@
               
               <!-- Right Side - Skills and Objectives -->
               <div class="col-lg-4">
-                <!-- Skills Section -->
+                
                  <!-- GitHub Timeline -->
                 <div class="section-container github-timeline-section mb-4">
                   <div class="section-header">
@@ -98,6 +98,8 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Skills Section -->
                 <div class="section-container skills-section mb-4">
                   <div class="section-header">
                     <h2 class="text-white">

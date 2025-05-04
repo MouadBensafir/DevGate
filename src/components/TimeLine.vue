@@ -151,7 +151,7 @@ watch(() => props.username, fetchContributions)
 .github-contributions {
   display: flex;
   flex-direction: column;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
 }
 
 .loading,
