@@ -261,7 +261,7 @@ const logout = async () => {
   --ocean-secondary: #5b86e5;
   --ocean-accent: #36d1dc;
   --ocean-light: #e6f7ff;
-  --ocean-dark: #0f2942;
+  --ocean-dark: #b2bec9;
   --ocean-gradient: linear-gradient(135deg, var(--ocean-primary), var(--ocean-secondary));
   --ocean-shadow: 0 4px 15px rgba(15, 41, 66, 0.2);
   --ocean-transition: all 0.3s ease;

@@ -56,7 +56,7 @@
           <div>
             <button
               @click="showModal = true"
-              class="btn btn-outline-light px-4 py-2 me-2"
+              class="btn btn-info px-4 py-2 me-2 mb-2 w-100"
             >
               <i class="bi bi-clock-history me-2"></i>Log Coding Hours
             </button>
@@ -194,7 +194,7 @@
               <div class="col-lg-4">
                 <!-- Skills Section -->
                 <!-- GitHub Timeline -->
-                <div class="section-container github-timeline-section mb-4">
+                <div class="section-container github-timeline-section mb-4" v-if="userInfo.githubUsername">
                   <div class="section-header">
                     <h2 class="text-white">
                       <i class="bi bi-git me-2"></i>GitHub Activity
@@ -359,7 +359,7 @@
 
           <!-- Objectives Timeline -->
           <div class="col-12" v-if="objectivesData.length > 0">
-            <div class="section-container chart-container">
+            <div class="section-container chart-container mt-4">
               <div class="section-header">
                 <h2 class="text-white">
                   <i class="bi bi-calendar3 me-2"></i>Objectives Timeline
@@ -373,7 +373,7 @@
 
           <!-- Activity Timeline -->
           <div class="col-12">
-            <div class="section-container chart-container">
+            <div class="section-container chart-container mt-4">
               <div class="section-header">
                 <h2 class="text-white">
                   <i class="bi bi-activity me-2"></i>Recent Activity

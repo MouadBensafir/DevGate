@@ -64,32 +64,32 @@
           <div class="text-end mb-2">
             <button type="button" class="btn-close" @click="showCreateForm = false"></button>
           </div>
-          <h2 class="text-center mb-4 fw-bold">Ajouter une nouvelle compétence</h2>
+          <h2 class="text-center mb-4 fw-bold">Add a brand new skill to your skill set !</h2>
 
           <div class="mb-3">
-            <label for="skill" class="form-label fw-semibold">Compétence</label>
+            <label for="skill" class="form-label fw-semibold">Skill Name</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
-              <input type="text" id="skill" class="form-control" placeholder="Nom de la compétence" v-model="newSkill" required />
+              <input type="text" id="skill" class="form-control" placeholder="Name of the skill" v-model="newSkill" required />
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="level" class="form-label fw-semibold">Niveau</label>
+            <label for="level" class="form-label fw-semibold">Level</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-bar-chart-fill"></i></span>
               <select id="level" class="form-select" v-model="level" required>
-                <option value="" disabled>Sélectionnez un niveau</option>
-                <option value="beginner">Débutant</option>
-                <option value="intermediate">Intermédiaire</option>
-                <option value="advanced">Avancé</option>
+                <option value="" disabled>Select a level</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Avanced</option>
                 <option value="expert">Expert</option>
               </select>
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="aquisition" class="form-label fw-semibold">Date d'acquisition</label>
+            <label for="aquisition" class="form-label fw-semibold">Acquisition Date</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
               <input type="date" id="aquisition" v-model="aquDate" class="form-control" />
