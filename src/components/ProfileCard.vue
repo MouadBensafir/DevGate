@@ -1,6 +1,9 @@
 <script setup>
-import { defineProps } from 'vue';
+import {defineProps, ref} from 'vue';
 import { useRouter } from 'vue-router';
+import {getAuth} from "firebase/auth";
+import {setDoc, doc} from "firebase/firestore";
+import {db} from "@/firebase";
 
 const props = defineProps({
   user: {
@@ -8,6 +11,8 @@ const props = defineProps({
     required: true
   }
 });
+
+const connectedUser = ref(getAuth().currentUser);
 
 const router = useRouter();
 
@@ -20,6 +25,16 @@ function formatDate(date) {
   const d = date.toDate ? date.toDate() : new Date(date);
   return d.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
 }
+
+async function sendMessage() {
+  const group = {
+    groupMembers: [connectedUser.value.uid, props.user.id],
+    date: new Date(),
+  }
+  await setDoc(doc(db, "groups", connectedUser.value.uid + props.user.id), group);
+  router.push("/discussion/" + connectedUser.value.uid + props.user.id);
+}
+
 </script>
 
 <template>
@@ -30,6 +45,10 @@ function formatDate(date) {
       <p class="card-text text-muted mb-1">{{ user.email }}</p>
       <p class="card-text">{{ user.bio }}</p>
       <small class="text-muted">Joined: {{ formatDate(user?.createdAt) }}</small>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-primary" @click.stop="goToProfile">View Profile</button>
+      <button v-if="connectedUser.uid !== user.id" class="btn btn-secondary" @click.stop="sendMessage">Send Message</button>
     </div>
   </div>
 </template>
