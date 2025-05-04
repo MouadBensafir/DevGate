@@ -53,7 +53,7 @@ const yearlyContributions = ref([])
 const today = new Date()
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const numberOfWeeks = 20 // Customize if you want more or fewer weeks
+const numberOfWeeks = 16 // Changed from 20 to 16 weeks (approximately 4 months)
 
 async function fetchContributions() {
   loading.value = true
@@ -108,7 +108,7 @@ const monthLabels = computed(() => {
   const labels = []
   let lastMonth = ''
 
-  weeks.value.forEach((week, ) => {
+  weeks.value.forEach(week => {
     const firstDayOfWeek = new Date(week[0]?.date)
     const month = firstDayOfWeek.toLocaleString('default', { month: 'short' })
 

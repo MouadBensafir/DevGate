@@ -7,33 +7,28 @@
 <script setup>
 import { ref, onMounted, watch, nextTick, onBeforeUnmount, defineProps } from 'vue';
 import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
 
+Chart.register(...registerables);
+console.log("je SUIS UN CHAT MWAHAHAHAHA");
 const props = defineProps({
-  objectives: {
+  projects: {
     type: Array,
     default: () => [],
     required: true,
-    validator: (value) => {
-      return Array.isArray(value) && value.every(obj => 
-        typeof obj === 'object' && 
-        'completed' in obj
-      );
-    }
   }
 });
-
+console.log("Here are the Projects YAY", props.projects);
 const chartCanvas = ref(null);
 let chartInstance = null;
 
-// Updated color scheme - completed first (green), not completed (gray)
+// Color scheme - completed (green), in progress (yellow)
 const chartData = ref({
-  labels: ['Completed', 'Not Completed'],
+  labels: ['Completed', 'In Progress'],
   datasets: [{
     data: [0, 0],
     backgroundColor: [
       '#198754', // Completed - Green
-      '#6c757d'  // Not Completed - Gray
+      '#ffc107'  // In Progress - Yellow
     ],
     borderColor: '#ffffff',
     borderWidth: 2,
@@ -41,13 +36,13 @@ const chartData = ref({
   }]
 });
 
-const processObjectives = (objectives) => {
-  if (!Array.isArray(objectives)) return [0, 0];
+const processProjects = (projects) => {
+  if (!Array.isArray(projects)) return [0, 0];
   
-  const completed = objectives.filter(obj => obj.completed).length;
-  const notCompleted = objectives.length - completed;
+  const completed = projects.filter(project => project.completed).length;
+  const inProgress = projects.length - completed;
   
-  return [completed, notCompleted]; // Completed first
+  return [completed, inProgress]; // Completed first
 };
 
 const initChart = () => {
@@ -89,7 +84,7 @@ const initChart = () => {
         },
         title: {
           display: true,
-          text: 'Objective Completion Status',
+          text: 'Project Completion Status',
           font: {
             size: 16,
             weight: 'bold'
@@ -107,8 +102,8 @@ const initChart = () => {
   });
 };
 
-const updateChartData = (objectives) => {
-  const newData = processObjectives(objectives);
+const updateChartData = (projects) => {
+  const newData = processProjects(projects);
   chartData.value.datasets[0].data = newData;
   
   if (chartInstance) {
@@ -117,10 +112,10 @@ const updateChartData = (objectives) => {
   }
 };
 
-watch(() => props.objectives, (newObjectives) => {
-  if (newObjectives) {
+watch(() => props.projects, (newProjects) => {
+  if (newProjects) {
     nextTick(() => {
-      updateChartData(newObjectives);
+      updateChartData(newProjects);
     });
   }
 }, { immediate: true, deep: true });
@@ -128,8 +123,8 @@ watch(() => props.objectives, (newObjectives) => {
 onMounted(() => {
   nextTick(() => {
     initChart();
-    if (props.objectives?.length) {
-      updateChartData(props.objectives);
+    if (props.projects?.length) {
+      updateChartData(props.projects);
     }
   });
 });
