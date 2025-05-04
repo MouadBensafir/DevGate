@@ -65,7 +65,8 @@ onSnapshot(
       messages.value.push({ id: doc.id, ...doc.data() });
     });
     await nextTick();
-    window.scrollTo(0, document.body.scrollHeight);
+    // Scroll to the bottom of the messages container
+    window.scrollTo(0, document.body.scrollHeight+1000);
   }
 );
 
