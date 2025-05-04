@@ -15,6 +15,7 @@ const router = useRouter();
 function handleSearch() {
   if (searchQuery.value) {
     router.push("/search/" + searchQuery.value);
+    searchQuery.value = '';
   }
 }
 </script>

@@ -1,6 +1,9 @@
 <script setup>
-import { defineProps } from 'vue';
+import {defineProps, ref} from 'vue';
 import { useRouter } from 'vue-router';
+import {getAuth} from "firebase/auth";
+import {setDoc, doc, getDoc} from "firebase/firestore";
+import {db} from "@/firebase";
 
 const props = defineProps({
   user: {
@@ -8,6 +11,8 @@ const props = defineProps({
     required: true
   }
 });
+
+const connectedUser = ref(getAuth().currentUser);
 
 const router = useRouter();
 
@@ -20,6 +25,26 @@ function formatDate(date) {
   const d = date.toDate ? date.toDate() : new Date(date);
   return d.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
 }
+
+async function sendMessage() {
+  const group = {
+    groupMembers: [connectedUser.value.uid, props.user.id],
+    date: new Date(),
+  }
+  if (connectedUser.value.uid > props.user.id) {
+    group.groupID = connectedUser.value.uid + props.user.id;
+  } else {
+    group.groupID = props.user.id + connectedUser.value.uid;
+  }
+  // we set a new group if it doesn't exist
+  const groupRef = doc(db, "groups", group.groupID);
+  const groupSnap = await getDoc(groupRef);
+  if (!groupSnap.exists()) {
+    await setDoc(groupRef, group);
+  }
+  router.push("/discussion/" + group.groupID);
+}
+
 </script>
 
 <template>
@@ -30,6 +55,10 @@ function formatDate(date) {
       <p class="card-text text-muted mb-1">{{ user.email }}</p>
       <p class="card-text">{{ user.bio }}</p>
       <small class="text-muted">Joined: {{ formatDate(user?.createdAt) }}</small>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-primary" @click.stop="goToProfile">View Profile</button>
+      <button v-if="connectedUser.uid !== user.id" class="btn btn-secondary" @click.stop="sendMessage">Send Message</button>
     </div>
   </div>
 </template>
