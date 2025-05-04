@@ -89,29 +89,15 @@
               </div>
               <div class="form-group">
                 <label for="hours">Hours Coded</label>
-                <div class="d-flex">
-                  <input
-                    type="number"
-                    id="hours"
-                    v-model="form.hours"
-                    class="form-control me-2"
-                    min="0"
-                    step="1"
-                    placeholder="Hours"
-                    required
-                  />
-                  <input
-                    type="number"
-                    id="minutes"
-                    v-model="form.minutes"
-                    class="form-control"
-                    min="0"
-                    max="59"
-                    step="1"
-                    placeholder="Minutes"
-                    required
-                  />
-                </div>
+                <input
+                  type="number"
+                  id="hours"
+                  v-model="form.hours"
+                  class="form-control"
+                  min="0"
+                  step="0.1"
+                  required
+                />
               </div>
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -270,9 +256,7 @@
                     </div>
                   </div>
                 </div>
-
                 <!-- Objectives Section -->
-                 <!-- Objectives Section -->
                 <div class="section-container objectives-section">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -304,8 +288,8 @@
           <!-- Charts Section -->
           <div class="charts-section">
             <div class="row g-4">
-              <!-- Skills PieChart  -->
-              <div class="col-md-6 col-lg-4">
+              <!-- Row 1 -->
+              <div class="col-md-6">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -317,14 +301,11 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Skills Distribution -->
-              <div class="col-md-6 col-lg-4">
+              <div class="col-md-6">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
-                      <i class="bi bi-pie-chart-fill me-2"></i>Skills
-                      Distribution
+                      <i class="bi bi-pie-chart-fill me-2"></i>Skills Distribution
                     </h2>
                   </div>
                   <div class="chart-content">
@@ -333,8 +314,8 @@
                 </div>
               </div>
 
-              <!-- Objectives Status -->
-              <div class="col-md-6 col-lg-4">
+              <!-- Row 2 -->
+              <div class="col-md-6">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
@@ -346,33 +327,45 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Objectives Timeline -->
-              <div class="col-12">
+              <div class="col-md-6">
                 <div class="section-container chart-container">
                   <div class="section-header">
                     <h2 class="text-white">
-                      <i class="bi bi-calendar3 me-2"></i>Objectives Timeline
+                      <i class="bi bi-clock-history me-2"></i>Coded Hours (Last 4 Months)
                     </h2>
                   </div>
                   <div class="chart-content">
-                    <GanttChart :tasks="objectivesData" />
+                    <CodedHoursPerMonth />
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- Activity Timeline -->
-              <div class="col-12">
-                <div class="section-container chart-container">
-                  <div class="section-header">
-                    <h2 class="text-white">
-                      <i class="bi bi-activity me-2"></i>Recent Activity
-                    </h2>
-                  </div>
-                  <div class="chart-content">
-                    <RealTimeLine :userId="user?.uid" />
-                  </div>
-                </div>
+          <!-- Objectives Timeline -->
+          <div class="col-12">
+            <div class="section-container chart-container">
+              <div class="section-header">
+                <h2 class="text-white">
+                  <i class="bi bi-calendar3 me-2"></i>Objectives Timeline
+                </h2>
+              </div>
+              <div class="chart-content">
+                <GanttChart :tasks="objectivesData" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Timeline -->
+          <div class="col-12">
+            <div class="section-container chart-container">
+              <div class="section-header">
+                <h2 class="text-white">
+                  <i class="bi bi-activity me-2"></i>Recent Activity
+                </h2>
+              </div>
+              <div class="chart-content">
+                <RealTimeLine :userId="user?.uid" />
               </div>
             </div>
           </div>
@@ -395,6 +388,8 @@ import PieChartProjects from "@/components/PieChartProjects.vue";
 import RealTimeLine from "@/components/RealTimeLine.vue";
 import useLinkGitHub from "@/composables/useLinkGitHub";
 import TimeLine from "@/components/TimeLine.vue";
+import CodedHoursPerMonth from "@/components/CodedHoursPerMonth.vue"
+
 
 const { linkGitHubAccount, error, isLoading } = useLinkGitHub();
 const skillsData = ref([]);
@@ -406,33 +401,23 @@ const userInfo = inject("userDoc");
 const loggedIn = inject("logged_in");
 
 const showModal = ref(false);
-const form = reactive({ date: "", hours: "", minutes: "" });
+const form = reactive({ date: "", hours: "" });
 const successMessage = ref("");
 
 const submitCodedHours = async () => {
   const today = new Date().toISOString().split("T")[0];
-  if (
-    !form.date ||
-    (!form.hours && !form.minutes) ||
-    isNaN(form.hours) ||
-    isNaN(form.minutes) ||
-    form.date >= today ||
-    form.minutes < 0 ||
-    form.minutes >= 60
-  ) {
-    successMessage.value = "Invalid input. Please ensure the date is in the past and minutes are valid.";
+  if (!form.date || !form.hours || isNaN(form.hours) || form.date >= today) {
+    successMessage.value = "Invalid input. Please ensure the date is in the past.";
     setTimeout(() => (successMessage.value = ""), 3000);
     return;
   }
-
-  const totalHours = parseFloat(form.hours) + parseFloat(form.minutes) / 60;
 
   try {
     await addDoc(
       collection(db, "users", user.value.uid, "codedhours"),
       {
         date: form.date,
-        hours: totalHours,
+        hours: parseFloat(form.hours),
         timestamp: new Date(),
       }
     );
@@ -441,7 +426,6 @@ const submitCodedHours = async () => {
     showModal.value = false;
     form.date = "";
     form.hours = "";
-    form.minutes = "";
   } catch (error) {
     console.error("Error logging coding hours:", error);
     successMessage.value = "Failed to log coding hours. Please try again.";
