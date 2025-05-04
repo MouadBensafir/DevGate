@@ -1,5 +1,5 @@
 <template>
-  <div class="ocean-search-wrapper d-flex justify-content-end align-items-center px-3 mt-4">
+  <div class="ocean-search-wrapper d-flex justify-content-end align-items-center px-3">
     <div class="ocean-search-container">
       <div class="ocean-search-icon">
         <i class="bi bi-search"></i>

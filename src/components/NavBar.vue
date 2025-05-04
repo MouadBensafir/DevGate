@@ -92,9 +92,8 @@
       ></div>
     </nav>
     
-    <!-- Version Desktop (verticale) -->
-    <nav class="ocean-sidebar d-none d-md-flex flex-column vh-100 p-3">    
-      <!-- SearchBar - Moved here for better visibility -->
+    <!-- Version Desktop -->
+    <nav class="ocean-sidebar d-none d-md-flex flex-column vh-100 p-3">   
       <!-- User Info -->
       <div class="ocean-user-info d-flex align-items-center mb-4 p-3">
         <div class="ocean-avatar me-3 position-relative">
@@ -157,7 +156,7 @@
             <i class="bi bi-activity me-3"></i>
             <span>Timeline</span>
           </router-link>
-          <button @click="logout" class="ocean-nav-item logout-btn d-flex align-items-center mb-3 p-3 w-100 text-start">
+          <button @click="logout" class="ocean-nav-item logout-btn d-flex align-items-center p-3 w-100 text-start">
             <i class="bi bi-box-arrow-right me-3"></i>
             <span>Logout</span>
           </button>
@@ -262,7 +261,7 @@ const logout = async () => {
   --ocean-secondary: #5b86e5;
   --ocean-accent: #36d1dc;
   --ocean-light: #e6f7ff;
-  --ocean-dark: #0f2942;
+  --ocean-dark: #b2bec9;
   --ocean-gradient: linear-gradient(135deg, var(--ocean-primary), var(--ocean-secondary));
   --ocean-shadow: 0 4px 15px rgba(15, 41, 66, 0.2);
   --ocean-transition: all 0.3s ease;

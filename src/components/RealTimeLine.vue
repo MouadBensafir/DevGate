@@ -254,7 +254,7 @@ onMounted(() => {
 }
 
 .filter-button.active {
-  color: white;
+  color: grey;
 }
 
 .filter-button.objective {

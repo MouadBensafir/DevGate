@@ -1,5 +1,5 @@
 <template>
-  <div class="projects-container d-flex flex-column px-md-5 px-3" style="min-height: 100vh; background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);">
+  <div class="projects-container d-flex flex-column px-md-5 px-3" style="background: linear-gradient(135deg, #1a3c5e 0%, #0f2942 100%);">
     <!-- Loading State - Modified to match skill tracker and ensure vertical centering -->
     <div v-if="loading" class="loading-state d-flex flex-column justify-content-center align-items-center py-5" style="min-height: 80vh;">
       <div class="spinner-container mb-4">
