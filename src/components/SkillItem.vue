@@ -31,7 +31,7 @@
         </small>
         </td>
         <td>
-        <div class="d-flex">
+        <div v-if="userId === user.uid" class="d-flex">
             <button class="btn btn-sm btn-outline-primary me-2" @click="$emit('upgrade', skill.id)" 
                     :disabled="skill.level === 'expert'">
             <i class="bi bi-arrow-up-circle"></i>
@@ -50,7 +50,9 @@
   
 <script setup>
 import { Timestamp } from 'firebase/firestore'
-import { defineProps } from 'vue'
+import { ref, defineProps } from 'vue'
+import { useRoute } from 'vue-router'
+import getUser from "@/composables/getUser";
   
 defineProps({
     skill: {
@@ -82,6 +84,11 @@ function getTimeAgo(timestamp) {
       return `${diffInSec} second${diffInSec > 1 ? 's' : ''}`
     }
   }
+  const { user } = getUser();
+  const route = useRoute();
+  const userId = ref(route.params.userId);
+  console.log('User ID:', userId.value, "Connected User ID:", user.uid);
+
 </script>
   
 <style scoped>
