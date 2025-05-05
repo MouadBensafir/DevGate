@@ -9,7 +9,7 @@ const actualUserId = route.params.userId;
 <template>
   <div class="project-view-container">
     <div class="d-flex justify-content-between align-items-center px-md-5 px-3 pt-5">
-      <h1 class="mb-0 text-white fw-bold"><i class="bi bi-folder-fill me-2"></i>My Projects</h1>
+      <h1 class="mb-0 text-white fw-bold"><i class="bi bi-folder-fill me-2"></i>Projects</h1>
       <router-link
         :to="'/users/' + actualUserId + '/projects/new'"
         class="btn add-project-btn"
