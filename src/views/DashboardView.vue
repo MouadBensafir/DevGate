@@ -420,7 +420,7 @@ const submitCodedHours = async () => {
     (!form.hours && !form.minutes) ||
     isNaN(form.hours) ||
     isNaN(form.minutes) ||
-    form.date >= today
+    form.date > today
   ) {
     successMessage.value =
       "Invalid input. Please ensure the date is in the past and values are valid.";

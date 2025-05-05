@@ -7,13 +7,13 @@
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-      <h2 class="text-white mb-2">Loading your skills...</h2>
+      <h2 class="text-white mb-2">Loading skills...</h2>
       <p class="text-white-50 text-center">Please wait while we fetch your skills data</p>
     </div>
 
     <!-- Skill list -->
     <div v-else-if="skillList.length" class="skills-content py-5 flex-grow-1">
-      <h1 class="text-white mb-4 fw-bold"><i class="bi bi-stars me-2"></i>My Skills</h1>
+      <h1 class="text-white mb-4 fw-bold"><i class="bi bi-stars me-2"></i>Skills</h1>
       
       <div class="skill-board bg-white rounded-4 shadow p-4">
         <div class="table-responsive">
@@ -24,7 +24,7 @@
                 <th scope="col" width="200px">Level</th>
                 <th scope="col">Progress Bar</th>
                 <th scope="col">Acquisition Date</th>
-                <th scope="col">Actions</th>
+                <th v-if="userId === user.uid" scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -115,11 +115,13 @@ import { useAddSkill } from '@/composables/useAddSkill'
 import { useFetchSkills } from '@/composables/useFetchSkills'
 import { db } from '@/firebase'
 import SkillItem from '@/components/SkillItem.vue'
+import getUser from '@/composables/getUser'
 
 const showCreateForm = ref(false)
 const isLoading = ref(false)
 const route = useRoute()
-const userId = route.params.userId
+const userId = route.params.userId;
+const { user } = getUser();
 
 const { newSkill, level, aquDate, addSkill } = useAddSkill()
 const { skillList, fetchSkills } = useFetchSkills(userId)
