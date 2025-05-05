@@ -28,14 +28,9 @@
       <!-- Loading State -->
       <div
         v-if="loading"
-        class="loading-state d-flex flex-column justify-content-center align-items-center py-5 flex-grow-1"
-      >
-        <div class="spinner-container mb-4">
-          <div
-            class="spinner-border text-light"
-            role="status"
-            style="width: 3rem; height: 3rem"
-          >
+        class="loading-state d-flex flex-column justify-content-center align-items-center py-5">
+        <div class="spinner-container" style="margin-top: 200px">
+          <div class="spinner-border text-light" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
@@ -192,7 +187,6 @@
 
               <!-- Right Side - Skills and Objectives -->
               <div class="col-lg-4">
-                <!-- Skills Section -->
                 <!-- GitHub Timeline -->
                 <div class="section-container github-timeline-section mb-4" v-if="userInfo.githubUsername">
                   <div class="section-header">

@@ -13,24 +13,25 @@
 
     <!-- Main Profile Content -->
     <div v-else class="profile-content py-5 flex-grow-1">
-      <h1 class="text-white mb-4 fw-bold"><i class="bi bi-person-circle me-2"></i>Profile</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-white mb-4 fw-bold"><i class="bi bi-person-circle me-2"></i>Profile</h1>
+        <!-- Edit Button -->
+        <div v-if="user.id === connectedUser?.uid" class="text-end mb-3">
+          <button
+            class="btn btn-ocean-action"
+            @click="changingProfile = !changingProfile"
+          >
+            <i class="bi" :class="changingProfile ? 'bi-x-lg' : 'bi-pencil-fill'"></i>
+            {{ changingProfile ? "Cancel" : "Edit Profile" }}
+          </button>
+        </div>
+      </div>
       
       <div class="profile-board bg-white rounded-4 shadow p-4">
         <div class="row g-4">
           <!-- Left Column - Profile Picture & Basic Info -->
           <div class="col-lg-4">
             <div class="profile-card h-100">
-              <!-- Edit Button -->
-              <div v-if="user.id === connectedUser?.uid" class="text-end mb-3">
-                <button
-                  class="btn btn-ocean-action"
-                  @click="changingProfile = !changingProfile"
-                >
-                  <i class="bi" :class="changingProfile ? 'bi-x-lg' : 'bi-pencil-fill'"></i>
-                  {{ changingProfile ? "Cancel" : "Edit Profile" }}
-                </button>
-              </div>
-
               <!-- Profile Picture Section -->
               <div class="profile-picture-section text-center mb-4">
                 <div v-if="changingProfile">
@@ -212,8 +213,10 @@
         </div>
         
         <div class="row g-4">
-          <div v-for="project in projects.slice(0, 3)" :key="project.id" class="col-md-4">
-            <ProjectItem :user-id="userId" :project-id="project.id"/>
+          <div class="list-group list-group-flush bg-white">
+            <div v-for="project in projects" :key="project.id" class="list-item">
+                <ProjectItem :userId="userId" :projectId="project.id"/>
+            </div>
           </div>
           <div v-if="!projects.length" class="col-12">
             <div class="bg-white rounded-4 shadow p-5 text-center">
